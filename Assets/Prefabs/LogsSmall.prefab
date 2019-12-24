@@ -12,12 +12,12 @@ GameObject:
   - component: {fileID: 2450241317707606213}
   - component: {fileID: 8159827720809321532}
   - component: {fileID: 7228575818001999334}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: LogsSmall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!4 &6870812702944350963
 Transform:
@@ -100,11 +100,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 6870812702944350963}
     m_Modifications:
-    - target: {fileID: -927199367670048503, guid: 199574a8f90267c4f9e45e059546811a,
-        type: 3}
-      propertyPath: m_Name
-      value: logs_stack
-      objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: 199574a8f90267c4f9e45e059546811a,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -159,6 +154,21 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: 199574a8f90267c4f9e45e059546811a,
+        type: 3}
+      propertyPath: m_Name
+      value: logs_stack
+      objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: 199574a8f90267c4f9e45e059546811a,
+        type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: 199574a8f90267c4f9e45e059546811a,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
       objectReference: {fileID: 0}
     - target: {fileID: -1504981713932161579, guid: 199574a8f90267c4f9e45e059546811a,
         type: 3}

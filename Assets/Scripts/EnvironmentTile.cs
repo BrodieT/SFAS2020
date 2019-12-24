@@ -11,6 +11,27 @@ public class EnvironmentTile : MonoBehaviour
     public float Local { get; set; }
     public bool Visited { get; set; }
     public bool IsAccessible { get; set; }
-    public bool IsStructure { get; set; }
     public Vector2Int GridPos { get; set; }
+    public bool IsStructure;
+
+
+    public EnvironmentTile StructureOrigin { get; set; }
+
+
+    private string TargetID;
+    public void SetTargetID(string ID)
+    {
+        TargetID = ID;
+    }
+    public string GetTargetID()
+    {
+        if (!IsStructure)
+        {
+            return "00000";
+        }
+        else
+        {
+            return TargetID;
+        }
+    }
 }

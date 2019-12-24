@@ -12,12 +12,12 @@ GameObject:
   - component: {fileID: 1450330417193392157}
   - component: {fileID: 5123991090928182500}
   - component: {fileID: 4443834457755422267}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Stone1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!4 &7600841881639887403
 Transform:
@@ -100,11 +100,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 7600841881639887403}
     m_Modifications:
-    - target: {fileID: -927199367670048503, guid: 97265ef46ade1d6418060a2711ce4dec,
-        type: 3}
-      propertyPath: m_Name
-      value: stone_large1
-      objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: 97265ef46ade1d6418060a2711ce4dec,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -159,6 +154,21 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: 97265ef46ade1d6418060a2711ce4dec,
+        type: 3}
+      propertyPath: m_Name
+      value: stone_large1
+      objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: 97265ef46ade1d6418060a2711ce4dec,
+        type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: 97265ef46ade1d6418060a2711ce4dec,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
       objectReference: {fileID: 0}
     - target: {fileID: -1504981713932161579, guid: 97265ef46ade1d6418060a2711ce4dec,
         type: 3}

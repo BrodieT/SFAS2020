@@ -16,13 +16,23 @@ public class Game : MonoBehaviour
     private Environment mMap;
 
     private readonly int NumberOfRaycastHits = 1;
+    public LayerMask mask;
+
 
     void Start()
     {
         mRaycastHits = new RaycastHit[NumberOfRaycastHits];
         mMap = GetComponentInChildren<Environment>();
-        mCharacter = Instantiate(Character, transform); 
+        mCharacter = Instantiate(Character, transform);
+        mCharacter.tag = "Player";
         ShowMenu(true);
+    }
+
+    public GameObject dialogue;
+    
+    public void ShowDialogueBox(bool show)
+    {
+        dialogue.SetActive(show);
     }
 
     private void Update()
@@ -33,16 +43,39 @@ public class Game : MonoBehaviour
         {
             Ray screenClick = MainCamera.ScreenPointToRay(Input.mousePosition);
             int hits = Physics.RaycastNonAlloc(screenClick, mRaycastHits);
-            if( hits > 0)
+            if (hits > 0)
             {
                 EnvironmentTile tile = mRaycastHits[0].transform.GetComponent<EnvironmentTile>();
+
                 if (tile != null)
                 {
-                    List<EnvironmentTile> route = mMap.Solve(mCharacter.CurrentPosition, tile);
-                    mCharacter.GoTo(route);
+                    List<EnvironmentTile> route = new List<EnvironmentTile>();
+
+                    if (tile.IsStructure)
+                    {
+                        tile = tile.StructureOrigin;
+                    }
+                   
+                    route = mMap.Solve(mCharacter.CurrentPosition, tile);
+                    if (route != null)
+                    {
+
+                        mCharacter.GoTo(route);
+                    }
+
                 }
             }
         }
+
+        if (mCharacter.atDestination && mCharacter.CurrentPosition.IsStructure)
+        {
+            ShowDialogueBox(true);
+        }
+    }
+
+    public void Go()
+    {
+        CellManager.GoToCell("Dungeon1");        
     }
 
     public void ShowMenu(bool show)

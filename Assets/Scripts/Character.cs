@@ -28,6 +28,7 @@ public class Character : MonoBehaviour
         }
     }
 
+   public bool atDestination = false;
     private IEnumerator DoGoTo(List<EnvironmentTile> route)
     {
         // Move through each tile in the given route
@@ -41,11 +42,16 @@ public class Character : MonoBehaviour
                 CurrentPosition = route[count];
                 position = next;
             }
+            atDestination = true;
         }
+
     }
+
+
 
     public void GoTo(List<EnvironmentTile> route)
     {
+        atDestination = false;
         // Clear all coroutines before starting the new route so 
         // that clicks can interupt any current route animation
         StopAllCoroutines();

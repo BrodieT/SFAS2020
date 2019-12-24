@@ -12,12 +12,12 @@ GameObject:
   - component: {fileID: 7728337658747699770}
   - component: {fileID: 4070158177426325187}
   - component: {fileID: 4813118846058157084}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Stone2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!4 &1593030275424679948
 Transform:
@@ -104,6 +104,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: stone_large2
+      objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: 89ae79d784dfe134db7708251127eff5,
+        type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: 89ae79d784dfe134db7708251127eff5,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: 89ae79d784dfe134db7708251127eff5,
         type: 3}

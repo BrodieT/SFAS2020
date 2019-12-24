@@ -13,10 +13,10 @@ TagManager:
   - UI
   - 
   - 
-  - 
-  - 
-  - 
-  - 
+  - Tile
+  - Structure
+  - Enemy
+  - Interactable
   - 
   - 
   - 

@@ -14,6 +14,14 @@ public class Environment : MonoBehaviour
     [SerializeField] private float AccessiblePercentage;
 
 
+    //TODO
+    //Fix the pathfinding to the structure origin nodes 
+    // ensure changes made to tiles are updated in mAll?
+    //Fix cancel button in dialogue box and ensure the player is returned to the entrance tile
+
+    //Find way to either modify code in environment generation or manually craft the interior cells
+    //Make temp models for the different structures that span multiple tiles
+
     private EnvironmentTile[][] mMap;
     private List<EnvironmentTile> mAll;
     private List<EnvironmentTile> mToBeTested;
@@ -75,59 +83,62 @@ public class Environment : MonoBehaviour
         }
     }
 
+    //This function is used when generating structures to esnure they arent spawned too close to each other or the start tile
     bool IsNear(int x, int y, int radius)
     {
+        //This list will store the tiles surrounding the given point using the radius provided
+        List<EnvironmentTile> eT = new List<EnvironmentTile>();
 
-        bool near = true;
-
-        if(x > Start.GridPos.x + radius
-        || y > Start.GridPos.y + radius
-        || x < Start.GridPos.x - radius
-        || y < Start.GridPos.y - radius
-
-        )
+        for(int i = -radius; i< radius; i++)
         {
-            if (StructureTiles.Count > 0)
+            for(int j = -radius; j < radius; j++)
             {
-                foreach (EnvironmentTile e in StructureTiles)
+                if (x + i > 0 && x + i < Size.x && y + j > 0 && y + j < Size.y)
                 {
-                    if (x > e.GridPos.x + radius
-                     || y > e.GridPos.y + radius
-                     || x < e.GridPos.x - radius
-                     || y < e.GridPos.y - radius)
-                    {
-                        near = false;
-                    }
-                    else
-                    {
-                        near = true;
-                    }
+                    eT.Add(mMap[x + i][y + j]);
                 }
             }
-            else
+        }
+        
+        
+        bool near = true;
+             
+        //loop through the surrounding tiles and return true if any of them are the start point or an existing structure
+        foreach(EnvironmentTile e in eT)
+        {
+            if(!e.IsStructure && e != Start)
             {
                 near = false;
             }
-        }
-        else
-        {
-            near = true;
+            else
+            {
+                //return true if any structures or start point is found and stop looping
+                return true;
+            }
         }
 
-        return near;
-        
+
+        return near;        
     }
+
 
     //This function will randomly generate the structures on the map
     private void GenerateStructures()
     {
+        int structCounter = 1;
+
       while(Structures.Count > 0)
         { 
             int x = Random.Range(0, Size.x);
             int y = Random.Range(0, Size.y);
 
-            if (!mMap[x][y].IsStructure && !IsNear(x, y, 5))
+            if (!mMap[x][y].IsStructure && !IsNear(x, y, 4) && y > Structures[0].GetComponent<StructureData>().Length / 2 + 1)
             {
+
+                int w = Structures[0].GetComponent<StructureData>().Width/2;
+                int l = Structures[0].GetComponent<StructureData>().Length/2;
+
+           
                 EnvironmentTile tile = Instantiate(Structures[0], mMap[x][y].Position - new Vector3((TileSize / 2), TileHeight, (TileSize / 2)), Quaternion.identity, transform);
                 tile.Position = mMap[x][y].Position;
                 tile.IsAccessible = false;
@@ -138,11 +149,32 @@ public class Environment : MonoBehaviour
                 
                 mMap[x][y] = tile;
                 mMap[x][y].IsStructure = true;
+                mMap[x][y].SetTargetID("0000" + structCounter.ToString());
+                structCounter++;
+
+
+
+                Structures[0].GetComponent<StructureData>().Entrance = mMap[x][y];
+
+
+                for (int i = -w; i < w; i++)
+                {
+                    for (int j = -l; j < l; j++)
+                    {
+                        //check if the grid position about to be accessed is within the bounds of the array
+                        if (x + i > 0 && x + i < Size.x && y + j > 0 && y + j < Size.y)
+                        {
+                            mMap[x + i][y + j].IsStructure = true;
+                            mMap[x + i][y + j].StructureOrigin = mMap[x][y - l];
+                            mMap[x + i][y + j].IsAccessible = true;
+
+                        }
+                    }
+                }
+
 
                 StructureTiles.Add(tile);
                 Structures.RemoveAt(0);
-
-
             }
         }
     }
@@ -268,7 +300,7 @@ public class Environment : MonoBehaviour
     public List<EnvironmentTile> Solve(EnvironmentTile begin, EnvironmentTile destination)
     {
         List<EnvironmentTile> result = null;
-        if (begin != null && destination != null)
+        if (begin != null && destination != null && destination.IsAccessible)
         {
             // Nothing to solve if there is a direct connection between these two locations
             EnvironmentTile directConnection = begin.Connections.Find(c => c == destination);
@@ -348,8 +380,7 @@ public class Environment : MonoBehaviour
                     }
                     result.Add(routeNode);
                     result.Reverse();
-
-                    Debug.LogFormat("Path Found: {0} steps {1} long", result.Count, destination.Local);
+                    //Debug.LogFormat("Path Found: {0} steps {1} long", result.Count, destination.Local);
                 }
                 else
                 {
