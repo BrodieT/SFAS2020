@@ -12,7 +12,10 @@ public class EnvironmentTile : MonoBehaviour
     public bool Visited { get; set; }
     public bool IsAccessible { get; set; }
     public Vector2Int GridPos { get; set; }
+
     public bool IsStructure;
+    
+    public bool IsEntrance { get; set; }
 
 
     public EnvironmentTile StructureOrigin { get; set; }

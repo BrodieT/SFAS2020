@@ -14,14 +14,6 @@ public class Environment : MonoBehaviour
     [SerializeField] private float AccessiblePercentage;
 
 
-    //TODO
-    //Fix the pathfinding to the structure origin nodes 
-    // ensure changes made to tiles are updated in mAll?
-    //Fix cancel button in dialogue box and ensure the player is returned to the entrance tile
-
-    //Find way to either modify code in environment generation or manually craft the interior cells
-    //Make temp models for the different structures that span multiple tiles
-
     private EnvironmentTile[][] mMap;
     private List<EnvironmentTile> mAll;
     private List<EnvironmentTile> mToBeTested;
@@ -38,6 +30,8 @@ public class Environment : MonoBehaviour
     {
         mAll = new List<EnvironmentTile>();
         mToBeTested = new List<EnvironmentTile>();
+
+        
     }
 
     private void OnDrawGizmos()
@@ -154,7 +148,7 @@ public class Environment : MonoBehaviour
 
 
 
-                Structures[0].GetComponent<StructureData>().Entrance = mMap[x][y];
+                Structures[0].GetComponent<StructureData>().Entrance = mMap[x][y - l];
 
 
                 for (int i = -w; i < w; i++)
@@ -164,10 +158,21 @@ public class Environment : MonoBehaviour
                         //check if the grid position about to be accessed is within the bounds of the array
                         if (x + i > 0 && x + i < Size.x && y + j > 0 && y + j < Size.y)
                         {
-                            mMap[x + i][y + j].IsStructure = true;
-                            mMap[x + i][y + j].StructureOrigin = mMap[x][y - l];
-                            mMap[x + i][y + j].IsAccessible = true;
 
+                            if(i == 0 && j < 0)
+                            {
+                                mMap[x + i][y + j].IsStructure = true;
+                                mMap[x + i][y + j].StructureOrigin = mMap[x][y - l];
+                                mMap[x + i][y + j].IsAccessible = true;
+                                mMap[x + i][y + j].IsEntrance = true;
+                            }
+                            else
+                            {
+                                mMap[x + i][y + j].IsStructure = true;
+                                mMap[x + i][y + j].StructureOrigin = mMap[x][y - l];
+                                mMap[x + i][y + j].IsAccessible = false;
+                                mMap[x + i][y + j].IsEntrance = false;
+                            }
                         }
                     }
                 }
@@ -179,7 +184,7 @@ public class Environment : MonoBehaviour
         }
     }
 
-    private void Generate()
+    private void Generate(bool isDungeon)
     {
         // Setup the map of the environment tiles according to the specified width and height
         // Generate tiles from the list of accessible and inaccessible prefabs using a random
@@ -196,7 +201,15 @@ public class Environment : MonoBehaviour
             mMap[x] = new EnvironmentTile[Size.y];
             for ( int y = 0; y < Size.y; ++y)
             {
-                bool isAccessible = start || Random.value < AccessiblePercentage;
+                bool isAccessible = true;
+                if (!isDungeon)
+                {
+                    isAccessible = start || Random.value < AccessiblePercentage;
+                }
+                else
+                {
+                    isAccessible = start || Random.value < 1;
+                }
                 List<EnvironmentTile> tiles = isAccessible ? AccessibleTiles : InaccessibleTiles;
                 EnvironmentTile prefab = tiles[Random.Range(0, tiles.Count)];
                 EnvironmentTile tile = Instantiate(prefab, position, Quaternion.identity, transform);
@@ -220,7 +233,6 @@ public class Environment : MonoBehaviour
             position.x += TileSize;
             position.z = -(halfHeight * TileSize);
         }
-        GenerateStructures();
     }
 
     private void SetupConnections()
@@ -278,7 +290,8 @@ public class Environment : MonoBehaviour
 
     public void GenerateWorld()
     {
-        Generate();
+        Generate(false);
+        GenerateStructures();
         SetupConnections();
     }
 
@@ -295,6 +308,95 @@ public class Environment : MonoBehaviour
             }
         }
     }
+
+    public void GenerateDungeon()
+    {
+        Generate(true);  
+        SetupConnections();
+
+        GenerateRooms();
+    }
+
+
+    //TODO change random numbers range to scale with world space size
+    //This function is used when generating dungeons to create the rooms within the interior space
+    //and the connections between these rooms
+    private void GenerateRooms()
+    {
+        List<EnvironmentTile> connectors = new List<EnvironmentTile>();
+
+        //Randomise the number of rooms present in the dungeon
+        //TODO scale the max number with the size of the world space
+        int roomCount = 4;//Random.Range(1, 4);
+        Debug.Log(roomCount);
+
+        bool first = false;
+
+        //This for loop will initialise the rooms within the dungeon
+        for (int i = 0; i < roomCount; i++)
+        {
+            int x = Random.Range(0, Size.x);
+            int y = Random.Range(0, Size.y);
+            Debug.Log(x + ", " + y);
+            int width = Random.Range(2, 10);
+            int length = Random.Range(2, 10);
+            Debug.Log(width + "x" + length);
+
+            connectors.Add(mMap[x][y]);
+
+
+            for (int j = x - width / 2; j < x + width / 2; j++)
+            {
+                for (int k = y - length / 2; k < y + length / 2; k++)
+                {
+                    if (j > 0 && j < Size.x && k > 0 && k < Size.y)
+                    {
+                        if(!first)
+                        {
+                            Start = mMap[j][k];
+                            first = true;
+                        }
+                        mMap[j][k].IsStructure = true;
+                        mMap[j][k].IsAccessible = true;
+                        Debug.Log("RoomTile");
+                    }
+                }
+            }
+
+        }
+
+        //Setup the connections between rooms via hallways using the Solve() pathfinding function 
+        //to set all tiles along the calculated route as a structure and therefore part of the dungeon
+        while (connectors.Count > 1)
+        {
+            Debug.Log("HallTile");
+            List<EnvironmentTile> route = Solve(connectors[0], connectors[1]);
+
+            foreach(EnvironmentTile e in route)
+            {
+                e.IsAccessible = true;
+                e.IsStructure = true;
+            }
+
+            connectors.RemoveAt(0);
+        }
+
+        //Iterate through the map to set all non-structure tiles to be inaccessible
+        for (int i = 0; i < Size.x; i++)
+        {
+            for (int j = 0; j < Size.y; j++)
+            {
+                if (!mMap[i][j].IsStructure)
+                {
+                    Debug.Log("NullTile");
+                    mMap[i][j].IsAccessible = false;
+                    mMap[i][j].GetComponent<MeshRenderer>().enabled = false;
+                }
+            }
+        }
+    }
+
+
 
     //This function handles the pathfinding through the world
     public List<EnvironmentTile> Solve(EnvironmentTile begin, EnvironmentTile destination)

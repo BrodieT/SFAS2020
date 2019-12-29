@@ -19,20 +19,34 @@ public class Game : MonoBehaviour
     public LayerMask mask;
 
 
+
     void Start()
     {
         mRaycastHits = new RaycastHit[NumberOfRaycastHits];
         mMap = GetComponentInChildren<Environment>();
+       
         mCharacter = Instantiate(Character, transform);
         mCharacter.tag = "Player";
         ShowMenu(true);
+
+        if(isDungeon)
+        {      
+            mMap.GenerateDungeon();
+            ShowMenu(false);
+        }
     }
 
     public GameObject dialogue;
+    public string target;
     
     public void ShowDialogueBox(bool show)
     {
         dialogue.SetActive(show);
+
+        if(!show)
+        {
+            target = null;
+        }
     }
 
     private void Update()
@@ -51,15 +65,16 @@ public class Game : MonoBehaviour
                 {
                     List<EnvironmentTile> route = new List<EnvironmentTile>();
 
-                    if (tile.IsStructure)
+                    if (tile.IsStructure && !isDungeon)
                     {
                         tile = tile.StructureOrigin;
+                        target = tile.GetTargetID();
+                        Debug.Log("Blep");
                     }
                    
                     route = mMap.Solve(mCharacter.CurrentPosition, tile);
                     if (route != null)
                     {
-
                         mCharacter.GoTo(route);
                     }
 
@@ -67,7 +82,7 @@ public class Game : MonoBehaviour
             }
         }
 
-        if (mCharacter.atDestination && mCharacter.CurrentPosition.IsStructure)
+        if (mCharacter.atDestination && mCharacter.CurrentPosition.IsStructure && mCharacter.CurrentPosition.IsEntrance)
         {
             ShowDialogueBox(true);
         }
@@ -100,11 +115,18 @@ public class Game : MonoBehaviour
         }
     }
 
+    public bool isDungeon = false;
     public void Generate()
     {
-        mMap.GenerateWorld();
+        if (isDungeon)
+        {
+            mMap.GenerateDungeon();
+        }
+        else
+        {
+            mMap.GenerateWorld();
+        }
     }
-
     public void Exit()
     {
 #if !UNITY_EDITOR

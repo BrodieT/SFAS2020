@@ -38,13 +38,13 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.4465782, g: 0.49641252, b: 0.5748167, a: 1}
+  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 11
-  m_GIWorkflowMode: 0
+  m_GIWorkflowMode: 1
   m_GISettings:
     serializedVersion: 2
     m_BounceScale: 1
@@ -800,7 +800,7 @@ PrefabInstance:
     - target: {fileID: 2041771723379211604, guid: 068b00b1b45e14e49a33d5ab4dc954a2,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -2.5
       objectReference: {fileID: 0}
     - target: {fileID: 2041771723379211604, guid: 068b00b1b45e14e49a33d5ab4dc954a2,
         type: 3}
@@ -1505,6 +1505,13 @@ MonoBehaviour:
   Menu: {fileID: 2099476870}
   Hud: {fileID: 1579498796}
   CharacterStart: {fileID: 561634765}
+  mask:
+    serializedVersion: 2
+    m_Bits: 256
+  dungeon: 0
+  dialogue: {fileID: 0}
+  target: 
+  isDungeon: 1
 --- !u!4 &896303072
 Transform:
   m_ObjectHideFlags: 0
@@ -2914,9 +2921,8 @@ MonoBehaviour:
   - {fileID: 7138291325998769488, guid: a7f29b24e935a1b4d8c83492d1556894, type: 3}
   - {fileID: 7138291325998769488, guid: a7f29b24e935a1b4d8c83492d1556894, type: 3}
   - {fileID: 7138291325998769488, guid: a7f29b24e935a1b4d8c83492d1556894, type: 3}
-  Size: {x: 50, y: 40}
-  AccessiblePercentage: 0.9
-  m: {fileID: 2100000, guid: 187f06a80088df34cbc55a7cd72e0e9f, type: 2}
+  Size: {x: 20, y: 20}
+  AccessiblePercentage: 1
 --- !u!4 &2083344931
 Transform:
   m_ObjectHideFlags: 0
