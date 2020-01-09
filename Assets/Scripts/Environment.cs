@@ -9,9 +9,9 @@ public class Environment : MonoBehaviour
     [SerializeField] private List<EnvironmentTile> InaccessibleTiles;
     [SerializeField] private List<EnvironmentTile> Structures;
     //The width and height of the grid
-    [SerializeField] private Vector2Int Size;
+    //[SerializeField] private Vector2Int Size;
     //The percentage of the grid that is accessible
-    [SerializeField] private float AccessiblePercentage;
+    //[SerializeField] private float AccessiblePercentage;
 
 
     private EnvironmentTile[][] mMap;
@@ -37,169 +37,68 @@ public class Environment : MonoBehaviour
     private void OnDrawGizmos()
     {
         // Draw the environment nodes and connections if we have them
-        if (mMap != null)
+        if (mmap != null)
         {
-            for (int x = 0; x < Size.x; ++x)
+            for (int x = 0; x < mmap.Count; ++x)
             {
-                for (int y = 0; y < Size.y; ++y)
+                for (int y = 0; y < mmap[x].Count; ++y)
                 {
-                    if (mMap[x][y].Connections != null)
+                    if (mmap[x][y].Connections != null)
                     {
-                        for (int n = 0; n < mMap[x][y].Connections.Count; ++n)
+                        for (int n = 0; n < mmap[x][y].Connections.Count; ++n)
                         {
                             Gizmos.color = Color.blue;
-                            Gizmos.DrawLine(mMap[x][y].Position, mMap[x][y].Connections[n].Position);
+                            Gizmos.DrawLine(mmap[x][y].Position, mmap[x][y].Connections[n].Position);
                         }
                     }
 
                     // Use different colours to represent the state of the nodes
                     Color c = Color.white;
-                    if ( !mMap[x][y].IsAccessible )
+                    if ( !mmap[x][y].IsAccessible )
                     {
                         c = Color.red;
                     }
                     else
                     {
-                        if(mLastSolution != null && mLastSolution.Contains( mMap[x][y] ))
+                        if(mLastSolution != null && mLastSolution.Contains( mmap[x][y] ))
                         {
                             c = Color.green;
                         }
-                        else if (mMap[x][y].Visited)
+                        else if (mmap[x][y].Visited)
                         {
                             c = Color.yellow;
                         }
                     }
 
                     Gizmos.color = c;
-                    Gizmos.DrawWireCube(mMap[x][y].Position, NodeSize);
+                    Gizmos.DrawWireCube(mmap[x][y].Position, NodeSize);
                 }
             }
         }
     }
 
-    //This function is used when generating structures to esnure they arent spawned too close to each other or the start tile
-    bool IsNear(int x, int y, int radius)
-    {
-        //This list will store the tiles surrounding the given point using the radius provided
-        List<EnvironmentTile> eT = new List<EnvironmentTile>();
 
-        for(int i = -radius; i< radius; i++)
-        {
-            for(int j = -radius; j < radius; j++)
-            {
-                if (x + i > 0 && x + i < Size.x && y + j > 0 && y + j < Size.y)
-                {
-                    eT.Add(mMap[x + i][y + j]);
-                }
-            }
-        }
-        
-        
-        bool near = true;
-             
-        //loop through the surrounding tiles and return true if any of them are the start point or an existing structure
-        foreach(EnvironmentTile e in eT)
-        {
-            if(!e.IsStructure && e != Start)
-            {
-                near = false;
-            }
-            else
-            {
-                //return true if any structures or start point is found and stop looping
-                return true;
-            }
-        }
+    ////////////////////////////////////////////////////////////////////
+    ///FUNCTIONS USING LISTS OF LISTS INSTEAD OF 2D ARRAYS
+    ///////////////////////////////////////////////////////////////////
+    ///
+    public List<GameObject> structurePrefabs = new List<GameObject>();
 
-
-        return near;        
-    }
-
-
-    //This function will randomly generate the structures on the map
-    private void GenerateStructures()
-    {
-        int structCounter = 1;
-
-      while(Structures.Count > 0)
-        { 
-            int x = Random.Range(0, Size.x);
-            int y = Random.Range(0, Size.y);
-
-            if (!mMap[x][y].IsStructure && !IsNear(x, y, 4) && y > Structures[0].GetComponent<StructureData>().Length / 2 + 1)
-            {
-
-                int w = Structures[0].GetComponent<StructureData>().Width/2;
-                int l = Structures[0].GetComponent<StructureData>().Length/2;
-
-           
-                EnvironmentTile tile = Instantiate(Structures[0], mMap[x][y].Position - new Vector3((TileSize / 2), TileHeight, (TileSize / 2)), Quaternion.identity, transform);
-                tile.Position = mMap[x][y].Position;
-                tile.IsAccessible = false;
-                tile.GridPos = new Vector2Int(x, y);
-                Destroy(GameObject.Find(mMap[x][y].name).gameObject);
-
-                tile.gameObject.name = mMap[x][y].name;
-                
-                mMap[x][y] = tile;
-                mMap[x][y].IsStructure = true;
-                mMap[x][y].SetTargetID("0000" + structCounter.ToString());
-                structCounter++;
-
-
-
-                Structures[0].GetComponent<StructureData>().Entrance = mMap[x][y - l];
-
-
-                for (int i = -w; i < w; i++)
-                {
-                    for (int j = -l; j < l; j++)
-                    {
-                        //check if the grid position about to be accessed is within the bounds of the array
-                        if (x + i > 0 && x + i < Size.x && y + j > 0 && y + j < Size.y)
-                        {
-
-                            if(i == 0 && j < 0)
-                            {
-                                mMap[x + i][y + j].IsStructure = true;
-                                mMap[x + i][y + j].StructureOrigin = mMap[x][y - l];
-                                mMap[x + i][y + j].IsAccessible = true;
-                                mMap[x + i][y + j].IsEntrance = true;
-                            }
-                            else
-                            {
-                                mMap[x + i][y + j].IsStructure = true;
-                                mMap[x + i][y + j].StructureOrigin = mMap[x][y - l];
-                                mMap[x + i][y + j].IsAccessible = false;
-                                mMap[x + i][y + j].IsEntrance = false;
-                            }
-                        }
-                    }
-                }
-
-
-                StructureTiles.Add(tile);
-                Structures.RemoveAt(0);
-            }
-        }
-    }
-
-    private void Generate(bool isDungeon)
+    private List<List<EnvironmentTile>> Generate(List<List<EnvironmentTile>> map, bool isDungeon, Vector2Int Size, float AccessiblePercentage)
     {
         // Setup the map of the environment tiles according to the specified width and height
         // Generate tiles from the list of accessible and inaccessible prefabs using a random
         // and the specified accessible percentage
-        mMap = new EnvironmentTile[Size.x][];
 
         int halfWidth = Size.x / 2;
         int halfHeight = Size.y / 2;
-        Vector3 position = new Vector3( -(halfWidth * TileSize), 0.0f, -(halfHeight * TileSize) );
+        Vector3 position = new Vector3(-(halfWidth * TileSize), 0.0f, -(halfHeight * TileSize));
         bool start = true;
 
-        for ( int x = 0; x < Size.x; ++x)
+        for (int x = 0; x < Size.x; ++x)
         {
-            mMap[x] = new EnvironmentTile[Size.y];
-            for ( int y = 0; y < Size.y; ++y)
+            map.Add(new List<EnvironmentTile>());
+            for (int y = 0; y < Size.y; ++y)
             {
                 bool isAccessible = true;
                 if (!isDungeon)
@@ -212,16 +111,15 @@ public class Environment : MonoBehaviour
                 }
                 List<EnvironmentTile> tiles = isAccessible ? AccessibleTiles : InaccessibleTiles;
                 EnvironmentTile prefab = tiles[Random.Range(0, tiles.Count)];
-                EnvironmentTile tile = Instantiate(prefab, position, Quaternion.identity, transform);
-                tile.Position = new Vector3( position.x + (TileSize / 2), TileHeight, position.z + (TileSize / 2));
+                EnvironmentTile tile = new EnvironmentTile();// = Instantiate(prefab, position, Quaternion.identity, transform);
+                tile.Position = new Vector3(position.x + (TileSize / 2), TileHeight, position.z + (TileSize / 2));
                 tile.IsAccessible = isAccessible;
                 tile.IsStructure = false;
-                tile.gameObject.name = string.Format("Tile({0},{1})", x, y);
+                //                tile.gameObject.name = string.Format("Tile({0},{1})", x, y);
                 tile.GridPos = new Vector2Int(x, y);
-                mMap[x][y] = tile;
-                mAll.Add(tile);
+                map[x].Add(tile);
 
-                if(start)
+                if (start)
                 {
                     Start = tile;
                 }
@@ -233,39 +131,303 @@ public class Environment : MonoBehaviour
             position.x += TileSize;
             position.z = -(halfHeight * TileSize);
         }
+
+        return map;
     }
 
+    private List<List<EnvironmentTile>> GenerateStructures(List<List<EnvironmentTile>> map, Vector2Int Size)
+    {
+        int structCounter = 1;
+        int counter = 0;
+        int StructCount = Structures.Count;
+        while (StructCount > 0)
+        {
+            if (counter <= 5)
+            {
+                int x = Random.Range(0, Size.x);
+                int y = Random.Range(0, Size.y);
+
+                if (!map[x][y].IsStructure && !IsNear(x, y, 4, Size, map) && y > Structures[0].GetComponent<StructureData>().Length / 2 + 1)
+                {
+                    int w = Structures[0].GetComponent<StructureData>().Width / 2;
+                    int l = Structures[0].GetComponent<StructureData>().Length / 2;
+
+                    EnvironmentTile tile = new EnvironmentTile();//Instantiate(Structures[0], map[x][y].Position - new Vector3((TileSize / 2), TileHeight, (TileSize / 2)), Quaternion.identity, transform);
+                    tile.Position = map[x][y].Position;
+                    tile.IsAccessible = false;
+                    tile.GridPos = new Vector2Int(x, y);
+
+                    map[x][y] = tile;
+                    map[x][y].IsStructure = true;
+                    map[x][y].IsChest = false;
+                    map[x][y].SetTargetID(structCounter);
+                    structCounter++;
+
+                    Structures[0].GetComponent<StructureData>().Entrance = map[x][y - l];
+
+                    for (int i = -w; i < w; i++)
+                    {
+                        for (int j = -l; j < l; j++)
+                        {
+                            //check if the grid position about to be accessed is within the bounds of the array
+                            if (x + i > 0 && x + i < Size.x && y + j > 0 && y + j < Size.y)
+                            {
+                                if (i == 0 && j == 0)
+                                {
+                                    map[x + i][y + j].IsAccessible = true;
+                                    map[x + i][y + j].IsEntrance = true;
+
+                                }
+                                else if (i == 0 && j < 0)
+                                {
+                                    map[x + i][y + j].IsAccessible = true;
+                                    map[x + i][y + j].IsEntrance = false;
+                                }
+                                else
+                                {
+                                    map[x + i][y + j].IsAccessible = false;
+                                    map[x + i][y + j].IsEntrance = false;
+                                }
+
+                                map[x + i][y + j].IsStructure = true;
+                                map[x + i][y + j].StructureOriginIndex = new Vector2Int(x, y);
+                            }
+                            
+                        }
+                    }
+
+
+                    counter = 0;
+                    StructureTiles.Add(tile);
+                    StructCount--;
+                }
+
+            }
+            else
+            {
+                StructCount--;
+                Debug.LogWarning("Failed to create structure");
+            }
+            counter++;
+        }
+
+        
+
+
+        map[3][3].IsChest = true;
+        map[3][3].IsAccessible = true;
+
+        return map;
+    }
+
+    //This function is used when generating structures to esnure they arent spawned too close to each other or the start tile
+    bool IsNear(int x, int y, int radius, Vector2Int Size, List<List<EnvironmentTile>> map)
+    {
+        //This list will store the tiles surrounding the given point using the radius provided
+        List<EnvironmentTile> eT = new List<EnvironmentTile>();
+
+        for (int i = -radius; i < radius; i++)
+        {
+            for (int j = -radius; j < radius; j++)
+            {
+                if (x + i > 5 && x + i < Size.x && y + j > 5 && y + j < Size.y)
+                {
+                    eT.Add(map[x + i][y + j]);
+                }
+            }
+        }
+
+
+        bool near = true;
+
+        //loop through the surrounding tiles and return true if any of them are the start point or an existing structure
+        foreach (EnvironmentTile e in eT)
+        {
+            if (!e.IsStructure)
+            {
+                near = false;
+            }
+            else
+            {
+                //return true if any structures or start point is found and stop looping
+                return true;
+            }
+        }
+
+
+        return near;
+    }
+    public List<List<EnvironmentTile>> GenerateWorld(float AccessiblePercentage, Vector2Int Size)
+    {
+        List<List<EnvironmentTile>> map = new List<List<EnvironmentTile>>();
+
+        map = Generate(map, false, Size, 0.85f);
+        
+        map = GenerateStructures(map, Size);
+
+        return map;
+    }
+
+    public List<List<EnvironmentTile>> mmap;
     private void SetupConnections()
     {
         // Currently we are only setting up connections between adjacnt nodes
-        for (int x = 0; x < Size.x; ++x)
+        for (int x = 0; x < mmap.Count; ++x)
         {
-            for (int y = 0; y < Size.y; ++y)
+            for (int y = 0; y < mmap[x].Count; ++y)
             {
-                EnvironmentTile tile = mMap[x][y];
+
+                EnvironmentTile tile = mmap[x][y];
                 tile.Connections = new List<EnvironmentTile>();
                 if (x > 0)
                 {
-                    tile.Connections.Add(mMap[x - 1][y]);
+                    tile.Connections.Add(mmap[x - 1][y]);
                 }
 
-                if (x < Size.x - 1)
+                if (x < mmap.Count - 1)
                 {
-                    tile.Connections.Add(mMap[x + 1][y]);
+                    tile.Connections.Add(mmap[x + 1][y]);
                 }
 
                 if (y > 0)
                 {
-                    tile.Connections.Add(mMap[x][y - 1]);
+                    tile.Connections.Add(mmap[x][y - 1]);
                 }
 
-                if (y < Size.y - 1)
+                if (y < mmap[x].Count - 1)
                 {
-                    tile.Connections.Add(mMap[x][y + 1]);
+                    tile.Connections.Add(mmap[x][y + 1]);
                 }
             }
         }
+        
     }
+
+    public List<EnvironmentTile> nullTile;
+    public EnvironmentTile chest;
+    public void CreateCell(List<List<EnvironmentTile>> map, bool isDungeon)
+    {
+
+        mAll.Clear();
+        mToBeTested.Clear();
+
+        
+        int halfWidth = map.Count / 2;
+        int halfHeight = map[0].Count / 2;
+        Vector3 position = new Vector3(-(halfWidth * TileSize), 0.0f, -(halfHeight * TileSize));
+
+        for (int x = 0; x < map.Count; x++)
+        {
+            for (int y = 0; y < map[x].Count; y++)
+            {
+
+                List<EnvironmentTile> tiles;
+
+                if (!isDungeon)
+                {
+                    if (map[x][y].IsAccessible && !map[x][y].IsEntrance)
+                    {
+                        tiles = AccessibleTiles;
+                    }
+                    else if (map[x][y].IsStructure && !map[x][y].IsEntrance)
+                    {
+                        tiles = AccessibleTiles;
+                    }
+                    else
+                    {
+                        tiles = InaccessibleTiles;
+                    }
+                }
+                else
+                {
+                    if (map[x][y].IsAccessible && !map[x][y].IsEntrance)
+                    {
+                        tiles = AccessibleTiles;
+                    }
+                    else if (map[x][y].IsAccessible && map[x][y].IsEntrance)
+                    {
+                        tiles = Structures;
+                    }
+                    else
+                    {
+                        tiles = InaccessibleTiles;
+                    }
+                }
+
+                
+
+                EnvironmentTile prefab = tiles[Random.Range(0, tiles.Count)];
+
+                if (map[x][y].IsStructure && map[x][y].IsEntrance)
+                {
+                    prefab = Structures[0];
+                }
+
+                if (map[x][y].IsChest)
+                {
+                    prefab = chest;
+                }
+
+                EnvironmentTile tile = Instantiate(prefab, position, Quaternion.identity, transform);
+                tile.gameObject.name = string.Format("Tile({0},{1})", x, y);
+
+                tile.Connections = map[x][y].Connections;
+                tile.GridPos = map[x][y].GridPos;
+                tile.Position = map[x][y].Position;
+                tile.IsAccessible = map[x][y].IsAccessible;
+                tile.IsStructure = map[x][y].IsStructure;
+
+                if (!isDungeon)
+                {
+                    if (tile.IsStructure)
+                    {
+                        tile.StructureOriginIndex = map[x][y].StructureOriginIndex;
+                    }
+                }
+                tile.IsEntrance = map[x][y].IsEntrance;
+                if (tile.IsEntrance)
+                {
+                    tile.IsAccessible = true;
+                }
+
+                if (map[x][y].GetTargetID() != 0)
+                {
+                    tile.SetTargetID(map[x][y].GetTargetID());
+                }
+                tile.TileNumb = map[x][y].TileNumb;
+
+
+
+
+                position.z += TileSize;
+
+                mAll.Add(tile);
+                map[x][y] = tile;
+
+
+            }
+            position.x += TileSize;
+            position.z = -(halfHeight * TileSize);
+        }
+
+        mmap = map;
+        SetupConnections();
+
+
+        if (isDungeon)
+        {
+            ConnectRooms();
+            SetupConnections();
+
+            Start = mmap[Start.GridPos.x][Start.GridPos.y];
+        }
+        else
+        {
+            Debug.Log("0,0 startpos");
+            Start = mmap[0][0];
+        }
+    }
+    /////////////////////////////////////////////////////////////////////////////////
 
     private float Distance(EnvironmentTile a, EnvironmentTile b)
     {
@@ -288,47 +450,92 @@ public class Environment : MonoBehaviour
         return Vector3.Distance(a.Position, b.Position);
     }
 
-    public void GenerateWorld()
-    {
-        Generate(false);
-        GenerateStructures();
-        SetupConnections();
-    }
-
     public void CleanUpWorld()
     {
-        if (mMap != null)
+        if (mmap != null)
         {
-            for (int x = 0; x < Size.x; ++x)
+            for (int x = 0; x < mmap.Count; ++x)
             {
-                for (int y = 0; y < Size.y; ++y)
+                for (int y = 0; y < mmap[x].Count; ++y)
                 {
-                    Destroy(mMap[x][y].gameObject);
+                    Destroy(mmap[x][y].gameObject);
                 }
             }
         }
     }
 
-    public void GenerateDungeon()
-    {
-        Generate(true);  
-        SetupConnections();
 
-        GenerateRooms();
+    
+    //Dungeon Generation    
+    public List<List<EnvironmentTile>> GenerateDungeon(float AccessiblePercentage, Vector2Int Size)
+    {
+        List<List<EnvironmentTile>> map = new List<List<EnvironmentTile>>();
+
+        map = Generate(map, true, Size, AccessiblePercentage);
+       
+        map = GenerateRooms(map, Size);
+       
+        return map;
     }
 
+
+    private void ConnectRooms()
+    {
+        //Setup the connections between rooms via hallways using the Solve() pathfinding function 
+        //to set all tiles along the calculated route as a structure and therefore part of the dungeon
+        while (connectors.Count > 1)
+        {
+            List<EnvironmentTile> route = Solve(mmap[connectors[0].GridPos.x][connectors[0].GridPos.y], mmap[connectors[1].GridPos.x][connectors[1].GridPos.y]);
+
+            if (route != null)
+            {
+                Debug.Log("Create Corridor");
+                foreach (EnvironmentTile e in route)
+                {
+                    e.IsAccessible = true;
+                    e.IsStructure = true;
+                }
+            }
+            else
+            {
+                Debug.LogWarning("Cannot create corridor");
+            }
+            connectors.RemoveAt(0);
+        }
+
+        //Iterate through the map to set all non-structure tiles to be inaccessible
+        for (int i = 0; i < mmap.Count; i++)
+        {
+            for (int j = 0; j < mmap[i].Count; j++)
+            {
+                if(mmap[i][j].IsEntrance)
+                {
+                    Start = mmap[i][j];
+                    Start.GridPos = new Vector2Int(i, j);
+                }
+
+                if (!mmap[i][j].IsStructure)
+                {
+                    mmap[i][j].IsAccessible = false;
+                    mmap[i][j].gameObject.GetComponent<MeshRenderer>().enabled = false;
+                }
+
+            }
+        }
+ 
+    }
+    
+    List<EnvironmentTile> connectors = new List<EnvironmentTile>();
 
     //TODO change random numbers range to scale with world space size
     //This function is used when generating dungeons to create the rooms within the interior space
     //and the connections between these rooms
-    private void GenerateRooms()
+    private List<List<EnvironmentTile>> GenerateRooms(List<List<EnvironmentTile>> map, Vector2Int Size)
     {
-        List<EnvironmentTile> connectors = new List<EnvironmentTile>();
 
         //Randomise the number of rooms present in the dungeon
         //TODO scale the max number with the size of the world space
         int roomCount = 4;//Random.Range(1, 4);
-        Debug.Log(roomCount);
 
         bool first = false;
 
@@ -337,12 +544,10 @@ public class Environment : MonoBehaviour
         {
             int x = Random.Range(0, Size.x);
             int y = Random.Range(0, Size.y);
-            Debug.Log(x + ", " + y);
             int width = Random.Range(2, 10);
             int length = Random.Range(2, 10);
-            Debug.Log(width + "x" + length);
 
-            connectors.Add(mMap[x][y]);
+            connectors.Add(map[x][y]);
 
 
             for (int j = x - width / 2; j < x + width / 2; j++)
@@ -353,50 +558,24 @@ public class Environment : MonoBehaviour
                     {
                         if(!first)
                         {
-                            Start = mMap[j][k];
+                            map[j][k].IsEntrance = true;
+                            Start = map[j][k];
                             first = true;
                         }
-                        mMap[j][k].IsStructure = true;
-                        mMap[j][k].IsAccessible = true;
-                        Debug.Log("RoomTile");
+                        map[j][k].IsStructure = true;
+                        map[j][k].IsAccessible = true;
                     }
                 }
             }
 
         }
 
-        //Setup the connections between rooms via hallways using the Solve() pathfinding function 
-        //to set all tiles along the calculated route as a structure and therefore part of the dungeon
-        while (connectors.Count > 1)
-        {
-            Debug.Log("HallTile");
-            List<EnvironmentTile> route = Solve(connectors[0], connectors[1]);
+        
 
-            foreach(EnvironmentTile e in route)
-            {
-                e.IsAccessible = true;
-                e.IsStructure = true;
-            }
-
-            connectors.RemoveAt(0);
-        }
-
-        //Iterate through the map to set all non-structure tiles to be inaccessible
-        for (int i = 0; i < Size.x; i++)
-        {
-            for (int j = 0; j < Size.y; j++)
-            {
-                if (!mMap[i][j].IsStructure)
-                {
-                    Debug.Log("NullTile");
-                    mMap[i][j].IsAccessible = false;
-                    mMap[i][j].GetComponent<MeshRenderer>().enabled = false;
-                }
-            }
-        }
+        return map;
     }
 
-
+    
 
     //This function handles the pathfinding through the world
     public List<EnvironmentTile> Solve(EnvironmentTile begin, EnvironmentTile destination)
@@ -419,8 +598,10 @@ public class Environment : MonoBehaviour
                     mAll[count].Visited = false;
                 }
 
+                Debug.Log("Begin = " + begin.GridPos);
                 // Setup the start node to be zero away from start and estimate distance to target
                 EnvironmentTile currentNode = begin;
+                
                 currentNode.Local = 0.0f;
                 currentNode.Global = Heuristic(begin, destination);
 
@@ -499,7 +680,7 @@ public class Environment : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("Cannot find path for invalid nodes");
+            Debug.Log("Error finding path. Tiles may be null");
         }
 
         mLastSolution = result;
