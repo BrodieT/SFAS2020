@@ -105,6 +105,7 @@ GameObject:
   - component: {fileID: 3617053801945545627}
   - component: {fileID: 5225831561217036612}
   - component: {fileID: 7093103895150171822}
+  - component: {fileID: 6133462893709517865}
   m_Layer: 8
   m_Name: ChestTemp
   m_TagString: Untagged
@@ -199,3 +200,19 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 10, y: 2.5, z: 10}
   m_Center: {x: 5, y: 1.25, z: 5}
+--- !u!114 &6133462893709517865
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3030514941319876423}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c59f9ce768491d44888b0ca1f7fda94d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inventory: []
+  manager: {fileID: 0}
+  capacity: 0
+  isContainer: 1

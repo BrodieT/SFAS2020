@@ -7,6 +7,12 @@ public class Inventory : MonoBehaviour
     [SerializeField] public List<Item> inventory;
     public ItemManager manager;
     [SerializeField] public int capacity;
+    public bool isContainer = false;
+
+    public List<GameObject> gridcells = new List<GameObject>();
+
+    public int potionsCount;
+    public int currency;
 
     private void Start()
     {
@@ -15,6 +21,15 @@ public class Inventory : MonoBehaviour
         {
             Debug.LogError("Item Manager not found! Ensure the game controller has the appropriate tag and component.");
         }
+
+        if (isContainer)
+        {
+            for (int i = 0; i < Random.Range(1, 5); i++)
+            {
+                AddItem(Random.Range(0, manager.AllItems.Count));
+            }
+        }
+
     }
 
     public void AddItem(int id)
@@ -34,6 +49,17 @@ public class Inventory : MonoBehaviour
         {
             inventory.Add(manager.AllItems[id]);
         }
+
+        if(manager.AllItems[id].isPotion)
+        {
+            potionsCount++;
+        }
+
+        if (manager.AllItems[id].isCurrency)
+        {
+            currency++;
+        }
+        //manager.GetComponent<Game>().RefreshInventory(!isContainer);
     }
 
     public void RemoveItem(int id)
@@ -49,7 +75,23 @@ public class Inventory : MonoBehaviour
                 else
                 {
                     inventory.Remove(i);
+
+                    if(gridcells != null)
+                    {
+                       foreach(GameObject g in gridcells)
+                        {
+                            if(g.GetComponent<ItemStore>().ID == id)
+                            {
+                                Destroy(g);
+                                gridcells.Clear();
+                                return;
+                            }
+                        }
+
+                    }
                 }
+
+                gridcells.Clear();
                 return;
             }
         }

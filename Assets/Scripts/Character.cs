@@ -5,6 +5,109 @@ using UnityEngine;
 public class Character : MonoBehaviour
 {
     [SerializeField] private float SingleNodeMoveTime = 0.5f;
+    public bool atDestination = false;
+
+    [SerializeField] public int maxHP  {get;set;}
+    [SerializeField] public int currHP {get;set;}
+    [SerializeField] public int maxMG  {get;set;}
+    [SerializeField] public int currMG {get;set;}
+    [SerializeField] public int maxST  {get;set;}
+    [SerializeField] public int currST { get; set; }
+                    
+    [SerializeField] public int damage { get; set; }
+    [SerializeField] public int dmgThreshold { get; set; }
+
+    [SerializeField] public string characterName { get; set; }
+
+    private void Start()
+    {
+        Init();
+    }
+
+    public void Init()
+    {
+        maxHP = 100;
+        currHP = 100;
+        maxMG = 100;
+        currMG = 100;
+        maxST = 100;
+        currST = 100;
+        damage = 5;
+        dmgThreshold = 0;
+    }
+
+    public bool TakeDamage(int dmg)
+    {
+        currHP -= (dmg - dmgThreshold);
+
+        if(currHP <= 0)
+        {
+            currHP = 0;
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    public bool Consume(int stat, int amount)
+    {
+        switch (stat)
+        {
+            case 1:
+
+                if (currMG - amount >= 0)
+                {
+                    currMG -= amount;
+                    return true;
+                }
+                break;
+            case 2:
+
+                if (currST - amount >= 0)
+                {
+                    currST -= amount;
+                    return true;
+                }
+                break;
+            default:
+                break;
+        }
+        return false;
+    }
+    public void Restore(int stat, int amount)
+    {
+        switch(stat)
+        {
+            case 0:
+                currHP += amount;
+
+                if(currHP > maxHP)
+                {
+                    currHP = maxHP;
+                }
+                break;
+            case 1:
+                currMG += amount;
+
+                if (currMG > maxMG)
+                {
+                    currMG = maxMG;
+                }
+                break;
+            case 2:
+                currST += amount;
+
+                if (currST > maxST)
+                {
+                    currST = maxST;
+                }
+                break;
+            default:
+                Debug.LogWarning("Invalid Stat. Unable to restore desired amount");
+                break;
+        }
+    }
 
     public EnvironmentTile CurrentPosition { get; set; }
 
@@ -28,7 +131,6 @@ public class Character : MonoBehaviour
         }
     }
 
-   public bool atDestination = false;
     private IEnumerator DoGoTo(List<EnvironmentTile> route)
     {
         // Move through each tile in the given route
@@ -46,8 +148,6 @@ public class Character : MonoBehaviour
         }
 
     }
-
-
 
     public void GoTo(List<EnvironmentTile> route)
     {

@@ -5,8 +5,14 @@ using UnityEngine;
 public class Environment : MonoBehaviour
 {
     //List of prefabs for all tiles both accessible and inaccessible
-    [SerializeField] private List<EnvironmentTile> AccessibleTiles;
-    [SerializeField] private List<EnvironmentTile> InaccessibleTiles;
+    [SerializeField] private List<EnvironmentTile> AccessibleTilesWorld;
+    [SerializeField] private List<EnvironmentTile> InaccessibleTilesWorld;
+
+    [SerializeField] private List<EnvironmentTile> AccessibleTilesDungeon;
+    [SerializeField] private List<EnvironmentTile> InaccessibleTilesDungeon;
+
+    [SerializeField] private List<EnvironmentTile> PropsDungeon;
+
     [SerializeField] private List<EnvironmentTile> Structures;
     //The width and height of the grid
     //[SerializeField] private Vector2Int Size;
@@ -68,10 +74,24 @@ public class Environment : MonoBehaviour
                         {
                             c = Color.yellow;
                         }
+
+
+                        if(mmap[x][y].IsChest)
+                        {
+                            c = Color.black;
+                        }
                     }
 
-                    Gizmos.color = c;
-                    Gizmos.DrawWireCube(mmap[x][y].Position, NodeSize);
+                    if (mmap[x][y].IsEntrance)
+                    {
+                        Gizmos.color = Color.cyan;
+                        Gizmos.DrawWireCube(mmap[x][y].Position + Vector3.up, new Vector3(NodeSize.x, NodeSize.y * 2, NodeSize.z));
+                    }
+                    else
+                    {
+                        Gizmos.color = c;
+                        Gizmos.DrawWireCube(mmap[x][y].Position, NodeSize);
+                    }
                 }
             }
         }
@@ -109,8 +129,18 @@ public class Environment : MonoBehaviour
                 {
                     isAccessible = start || Random.value < 1;
                 }
-                List<EnvironmentTile> tiles = isAccessible ? AccessibleTiles : InaccessibleTiles;
-                EnvironmentTile prefab = tiles[Random.Range(0, tiles.Count)];
+                //List<EnvironmentTile> tiles;
+
+                //if (isDungeon)
+                //{
+                //    tiles = isAccessible ? AccessibleTilesDungeon : InaccessibleTilesDungeon;
+                //}
+                //else
+                //{
+                //   tiles = isAccessible ? AccessibleTilesWorld : InaccessibleTilesWorld;
+                //}
+
+                //EnvironmentTile prefab = tiles[Random.Range(0, tiles.Count)];
                 EnvironmentTile tile = new EnvironmentTile();// = Instantiate(prefab, position, Quaternion.identity, transform);
                 tile.Position = new Vector3(position.x + (TileSize / 2), TileHeight, position.z + (TileSize / 2));
                 tile.IsAccessible = isAccessible;
@@ -327,22 +357,22 @@ public class Environment : MonoBehaviour
                 {
                     if (map[x][y].IsAccessible && !map[x][y].IsEntrance)
                     {
-                        tiles = AccessibleTiles;
+                        tiles = AccessibleTilesWorld;
                     }
                     else if (map[x][y].IsStructure && !map[x][y].IsEntrance)
                     {
-                        tiles = AccessibleTiles;
+                        tiles = AccessibleTilesWorld;
                     }
                     else
                     {
-                        tiles = InaccessibleTiles;
+                        tiles = InaccessibleTilesWorld;
                     }
                 }
                 else
                 {
                     if (map[x][y].IsAccessible && !map[x][y].IsEntrance)
                     {
-                        tiles = AccessibleTiles;
+                        tiles = AccessibleTilesDungeon;
                     }
                     else if (map[x][y].IsAccessible && map[x][y].IsEntrance)
                     {
@@ -350,7 +380,7 @@ public class Environment : MonoBehaviour
                     }
                     else
                     {
-                        tiles = InaccessibleTiles;
+                        tiles = InaccessibleTilesDungeon;
                     }
                 }
 
@@ -396,7 +426,7 @@ public class Environment : MonoBehaviour
                 }
                 tile.TileNumb = map[x][y].TileNumb;
 
-
+                tile.IsChest = map[x][y].IsChest;
 
 
                 position.z += TileSize;
@@ -423,7 +453,6 @@ public class Environment : MonoBehaviour
         }
         else
         {
-            Debug.Log("0,0 startpos");
             Start = mmap[0][0];
         }
     }
@@ -517,7 +546,7 @@ public class Environment : MonoBehaviour
                 if (!mmap[i][j].IsStructure)
                 {
                     mmap[i][j].IsAccessible = false;
-                    mmap[i][j].gameObject.GetComponent<MeshRenderer>().enabled = false;
+                    //mmap[i][j].gameObject.GetComponent<MeshRenderer>().enabled = false;
                 }
 
             }
@@ -535,17 +564,26 @@ public class Environment : MonoBehaviour
 
         //Randomise the number of rooms present in the dungeon
         //TODO scale the max number with the size of the world space
-        int roomCount = 4;//Random.Range(1, 4);
+        int roomCount = 4;// Random.Range(2, 4);
 
         bool first = false;
+
+        int prevX = Size.x / 2;
+        int prevY = Size.y / 2;
 
         //This for loop will initialise the rooms within the dungeon
         for (int i = 0; i < roomCount; i++)
         {
-            int x = Random.Range(0, Size.x);
-            int y = Random.Range(0, Size.y);
-            int width = Random.Range(2, 10);
-            int length = Random.Range(2, 10);
+            int x = Random.Range(Mathf.Clamp(prevX - 20, 0 , Size.x), Mathf.Clamp(prevX + 20, 0, Size.x));
+            int y = Random.Range(Mathf.Clamp(prevY - 20, 0, Size.y), Mathf.Clamp(prevY + 20, 0, Size.y));
+            int width = Random.Range(5, 15);
+            int length = Random.Range(5, 15);
+            prevX = x;
+            prevY = y;
+
+
+
+            
 
             connectors.Add(map[x][y]);
 
@@ -598,7 +636,7 @@ public class Environment : MonoBehaviour
                     mAll[count].Visited = false;
                 }
 
-                Debug.Log("Begin = " + begin.GridPos);
+
                 // Setup the start node to be zero away from start and estimate distance to target
                 EnvironmentTile currentNode = begin;
                 

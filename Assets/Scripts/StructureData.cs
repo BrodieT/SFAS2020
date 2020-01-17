@@ -7,7 +7,7 @@ public class StructureData : MonoBehaviour
     [SerializeField] public int Width;
     [SerializeField] public int Length;
 
-    [SerializeField] public string ID;
+    [SerializeField] public int ID;
 
     public EnvironmentTile Entrance;
 }

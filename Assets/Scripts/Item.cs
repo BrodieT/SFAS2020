@@ -17,4 +17,8 @@ public class Item
     [SerializeField] public int attack;
     [SerializeField] public int defence;
 
+    [SerializeField] public bool isPotion;
+    [SerializeField] public bool isCurrency;
+
+
 }

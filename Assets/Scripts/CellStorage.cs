@@ -5,13 +5,14 @@ using UnityEngine;
 
 public class MapData
 {
-    public MapData(List<List<EnvironmentTile>> m, EnvironmentTile t)
+    public MapData(List<List<EnvironmentTile>> m, bool Dungeon)//EnvironmentTile t)
     {
         map = m;
-        start = t;
+        isDungeon = Dungeon;
+        //start = t;
     }
     public List<List<EnvironmentTile>> map { get; set; }
-    public EnvironmentTile start { get; set; }
+   // public EnvironmentTile start { get; set; }
     public bool isDungeon = false;
 }
 
@@ -27,6 +28,9 @@ public static class CellStorage
     //index in the list of the current cell
     public static int CurrentCell;
 
+
+    public static int previousCellX = 0;
+    public static int previousCellY = 0;
 
 
 }

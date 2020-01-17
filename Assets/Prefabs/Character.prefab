@@ -244,7 +244,7 @@ GameObject:
   - component: {fileID: 3082875032072227798}
   m_Layer: 0
   m_Name: Character
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -315,6 +315,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c59f9ce768491d44888b0ca1f7fda94d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  inventory: []
+  manager: {fileID: 0}
+  capacity: 0
+  isContainer: 0
+  gridcells: []
+  potionsCount: 0
+  currency: 0
 --- !u!1 &1250123887488821385
 GameObject:
   m_ObjectHideFlags: 0

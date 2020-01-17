@@ -169,6 +169,7 @@ GameObject:
   - component: {fileID: 3940979032732083110}
   - component: {fileID: 7138291325998769488}
   - component: {fileID: 7613158143431891922}
+  - component: {fileID: 4335163350486264179}
   m_Layer: 9
   m_Name: ground_dirtRiverTile
   m_TagString: Untagged
@@ -265,8 +266,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Width: 5
   Length: 5
-  ID: Dungeon1
+  ID: 1
   Entrance: {fileID: 7138291325998769488}
+--- !u!65 &4335163350486264179
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3354616025349887866}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 10, y: 2.5, z: 10}
+  m_Center: {x: 5, y: 1.25, z: 5}
 --- !u!1 &4471204550852573839
 GameObject:
   m_ObjectHideFlags: 0
@@ -356,7 +370,6 @@ GameObject:
   - component: {fileID: 3607818331616266}
   - component: {fileID: 8211613649471662173}
   - component: {fileID: 1720904638707132148}
-  - component: {fileID: 5246459408858458157}
   m_Layer: 9
   m_Name: Cube
   m_TagString: Untagged
@@ -433,19 +446,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!65 &5246459408858458157
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5103613629660088825}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1.22529, z: 1}
-  m_Center: {x: 0, y: 0.11264496, z: 0}
 --- !u!1 &5204892825813043898
 GameObject:
   m_ObjectHideFlags: 0
