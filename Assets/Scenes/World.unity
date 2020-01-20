@@ -2127,6 +2127,7 @@ GameObject:
   - component: {fileID: 896303073}
   - component: {fileID: 896303074}
   - component: {fileID: 896303075}
+  - component: {fileID: 896303076}
   m_Layer: 0
   m_Name: Game
   m_TagString: GameController
@@ -2158,6 +2159,7 @@ MonoBehaviour:
   SceneTransition: {fileID: 472607543}
   DialogueBox: {fileID: 1382679077}
   target: 0
+  PlayerCaught: 0
   plane: {fileID: 53156360}
   blackPlane: {fileID: 1212341187}
   playerInventory: {fileID: 3641728638725643086}
@@ -2256,6 +2258,22 @@ MonoBehaviour:
   enemyST: {fileID: 1803064029}
   BattleHUD: {fileID: 811275566}
   PlayerAttacks: {fileID: 1361702283}
+  HealCount: 3
+--- !u!114 &896303076
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 896303070}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51b053dc38728e547a0e69277cb01ef0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  roomT: []
+  EnemyPrefab: {fileID: 8020451151447039353, guid: 3d75b25f41ed40e4d82deaa5c775b401,
+    type: 3}
 --- !u!1 &930910946
 GameObject:
   m_ObjectHideFlags: 0
@@ -6848,6 +6866,7 @@ MonoBehaviour:
   structurePrefabs: []
   nullTile: []
   chest: {fileID: 5225831561217036612, guid: c6af81b05b4db05478d717e192268497, type: 3}
+  roomTiles: []
 --- !u!4 &2083344931
 Transform:
   m_ObjectHideFlags: 0

@@ -69,6 +69,8 @@
     <Compile Include="Assets\Scripts\Character.cs" />
     <Compile Include="Assets\Scripts\CombatManager.cs" />
     <Compile Include="Assets\Scripts\CreateWorld.cs" />
+    <Compile Include="Assets\Scripts\EnemyController.cs" />
+    <Compile Include="Assets\Scripts\EnemySpawner.cs" />
     <Compile Include="Assets\Scripts\Environment.cs" />
     <Compile Include="Assets\Scripts\EnvironmentTile.cs" />
     <Compile Include="Assets\Scripts\Game.cs" />

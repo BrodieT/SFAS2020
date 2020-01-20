@@ -71,6 +71,7 @@ public class Game : MonoBehaviour
         }
     }
 
+    public bool PlayerCaught = false;
     private void Update()
     {
         RefreshInventory();
@@ -119,14 +120,24 @@ public class Game : MonoBehaviour
             }
         }
 
-        if(Input.GetKeyDown(KeyCode.P))
+        
+
+        if(PlayerCaught && !mCharacter.InCombat)
         {
-            List<Character> e = new List<Character>();
-            Character enemy = new Character();
-            enemy.Init();
-            enemy.characterName = "Enemy";
-            e.Add(enemy);
-            GetComponent<CombatManager>().EngageCombat(e);
+            List<Character> EnemiesInCombat = new List<Character>();
+            foreach(Character e in GetComponent<EnemySpawner>().GetActiveEnemies())
+            {
+                if(e.gameObject.GetComponent<EnemyController>().DistanceToPlayer < 10)
+                {
+                    Character c = new Character();
+                    c = e;
+
+                    EnemiesInCombat.Add(c);
+                    GetComponent<EnemySpawner>().GetActiveEnemies().Remove(e);
+                    Destroy(e.gameObject);
+                }
+            }
+            GetComponent<CombatManager>().EngageCombat(EnemiesInCombat);
         }
 
         if (mCharacter.atDestination && mCharacter.CurrentPosition.IsChest)
@@ -136,7 +147,6 @@ public class Game : MonoBehaviour
 
         if (mCharacter.atDestination && mCharacter.CurrentPosition.IsStructure && mCharacter.CurrentPosition.IsEntrance)
         {
-            Debug.Log("At Entrance");
             ShowDialogueBox(true);
         }
     }
@@ -161,21 +171,34 @@ public class Game : MonoBehaviour
         }
 
         mMap.CleanUpWorld();
+        isDungeon = CellStorage.cells[cellID].isDungeon;
         mMap.CreateCell(CellStorage.cells[cellID].map, CellStorage.cells[cellID].isDungeon);
 
-        isDungeon = CellStorage.cells[cellID].isDungeon;
+        //ReLoad dungeon cell to ensure the room connections generate properly
+        //Requires the solve function to generate the corridors and therefore needs to be reloaded to ensure the correct tiles are set to inaccessible
+        //More elgant fix would be ideal but as a temporary solution a simple reload will suffice
+        if (isDungeon)
+        {
+            mMap.CleanUpWorld();
+            mMap.CreateCell(CellStorage.cells[cellID].map, CellStorage.cells[cellID].isDungeon);
+        }
 
         if (cellID == 0)
         {
+
             mCharacter.transform.position = mMap.mmap[CellStorage.previousCellX][CellStorage.previousCellY].Position;
             mCharacter.transform.rotation = Quaternion.identity;
             mCharacter.CurrentPosition = mMap.mmap[CellStorage.previousCellX][CellStorage.previousCellY];
+            GetComponent<EnemySpawner>().CleanupEnemies();
         }
         else
         {
             mCharacter.transform.position = mMap.Start.Position;
             mCharacter.transform.rotation = Quaternion.identity;
             mCharacter.CurrentPosition = mMap.mmap[mMap.Start.GridPos.x][mMap.Start.GridPos.y +1];
+            GetComponent<EnemySpawner>().roomT = mMap.roomTiles;
+            GetComponent<EnemySpawner>().Init(mMap.mmap, new Vector2Int(mMap.mmap.Count, mMap.mmap[0].Count));
+            GetComponent<EnemySpawner>().SpawnEnemies(5);
         }
 
 
@@ -188,9 +211,6 @@ public class Game : MonoBehaviour
     //Function called from the confirm button on the dialogue box for travelling to an interior
     public void ConfirmTravel()
     {
-        Debug.Log(mCharacter.CurrentPosition.gameObject.GetComponent<StructureData>().ID);
-        Debug.Log(target);
-
         if (target >= 0)
         {
             if (isDungeon)

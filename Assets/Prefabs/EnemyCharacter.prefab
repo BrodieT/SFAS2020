@@ -1206,6 +1206,7 @@ GameObject:
   - component: {fileID: 4007930760733245968}
   - component: {fileID: 7781238752059789496}
   - component: {fileID: 5461376282150623253}
+  - component: {fileID: -21450588779455632}
   m_Layer: 0
   m_Name: EnemyCharacter
   m_TagString: Enemy
@@ -1286,6 +1287,18 @@ MonoBehaviour:
   gridcells: []
   potionsCount: 0
   currency: 0
+--- !u!114 &-21450588779455632
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8020451151447039353}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d4a846815e1fd045aa1087a0ff2d21a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8096191492512725834
 GameObject:
   m_ObjectHideFlags: 0

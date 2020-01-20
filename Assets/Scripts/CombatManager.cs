@@ -30,6 +30,7 @@ public class CombatManager : MonoBehaviour
 
     [SerializeField] GameObject PlayerAttacks;
 
+    public int HealCount = 3;
     private void Start()
     {
         state = combatState.IDLE;
@@ -112,10 +113,11 @@ public class CombatManager : MonoBehaviour
                     }
                     break;
                 case attackType.HEAL:
-                    if (currentEnemy.Consume(1, 15))
+                    if (currentEnemy.Consume(1, 15 + (5* (3-HealCount))))
                     {
-                        currentEnemy.Restore(0, 25);
+                        currentEnemy.Restore(0, 5 * HealCount);
                         dialogue.text = currentEnemy.characterName + " casts healing on themself.";
+                        HealCount--;
                     }
                     break;
                 case attackType.POTION:
@@ -300,12 +302,17 @@ public class CombatManager : MonoBehaviour
         if (enemies.Count > 1)
         {
             enemies.RemoveAt(0);
+
             currentEnemy = enemies[0];
             state = combatState.PLAYER;
         }
         else
         {
+            enemies.RemoveAt(0);
+
             BattleHUD.gameObject.SetActive(false);
+            GameObject.FindGameObjectWithTag("GameController").GetComponent<Game>().PlayerCaught = false;
+            player.InCombat = false;
         }
     }
 
@@ -319,9 +326,6 @@ public class CombatManager : MonoBehaviour
         else if(state == combatState.PLAYER && !PlayerAttacks.activeSelf)
         {
             PlayerAttacks.SetActive(true);
-
         }
-
-
     }
 }

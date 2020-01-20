@@ -226,7 +226,12 @@ public class Environment : MonoBehaviour
                         }
                     }
 
-
+                    if (y - (l + 1) > 0 && x + 1 < Size.x && x - 1 > 0)
+                    {
+                        map[x][y - (l + 1)].IsAccessible = true;
+                        map[x + 1][y - (l + 1)].IsAccessible = true;
+                        map[x - 1][y - (l + 1)].IsAccessible = true;
+                    }
                     counter = 0;
                     StructureTiles.Add(tile);
                     StructCount--;
@@ -446,7 +451,9 @@ public class Environment : MonoBehaviour
 
         if (isDungeon)
         {
+            roomTiles.Clear();
             ConnectRooms();
+
             SetupConnections();
 
             Start = mmap[Start.GridPos.x][Start.GridPos.y];
@@ -457,6 +464,8 @@ public class Environment : MonoBehaviour
         }
     }
     /////////////////////////////////////////////////////////////////////////////////
+
+    public List<EnvironmentTile> roomTiles = new List<EnvironmentTile>();
 
     private float Distance(EnvironmentTile a, EnvironmentTile b)
     {
@@ -503,7 +512,7 @@ public class Environment : MonoBehaviour
         map = Generate(map, true, Size, AccessiblePercentage);
        
         map = GenerateRooms(map, Size);
-       
+
         return map;
     }
 
@@ -518,7 +527,6 @@ public class Environment : MonoBehaviour
 
             if (route != null)
             {
-                Debug.Log("Create Corridor");
                 foreach (EnvironmentTile e in route)
                 {
                     e.IsAccessible = true;
@@ -543,10 +551,14 @@ public class Environment : MonoBehaviour
                     Start.GridPos = new Vector2Int(i, j);
                 }
 
+                if(mmap[i][j].IsAccessible && !mmap[i][j].IsEntrance && !mmap[i][j].IsChest)
+                {
+                    roomTiles.Add(mmap[i][j]);
+                }
+
                 if (!mmap[i][j].IsStructure)
                 {
                     mmap[i][j].IsAccessible = false;
-                    //mmap[i][j].gameObject.GetComponent<MeshRenderer>().enabled = false;
                 }
 
             }
@@ -713,7 +725,7 @@ public class Environment : MonoBehaviour
                 result = new List<EnvironmentTile>();
                 result.Add(begin);
                 result.Add(destination);
-                Debug.LogFormat("Direct Connection: {0} <-> {1} {2} long", begin, destination, TileSize);
+//                Debug.LogFormat("Direct Connection: {0} <-> {1} {2} long", begin, destination, TileSize);
             }
         }
         else

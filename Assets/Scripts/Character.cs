@@ -19,8 +19,11 @@ public class Character : MonoBehaviour
 
     [SerializeField] public string characterName { get; set; }
 
+    public bool InCombat { get; set; }
+
     private void Start()
     {
+        InCombat = false;
         Init();
     }
 

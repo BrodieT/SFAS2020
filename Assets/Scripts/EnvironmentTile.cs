@@ -24,6 +24,7 @@ public class EnvironmentTile : MonoBehaviour
     //Stores the origin tile for a structure
     public Vector2Int StructureOriginIndex { get; set; }
 
+    public bool isOccupied { get; set; }
     public bool IsChest { get; set; }
 
 
