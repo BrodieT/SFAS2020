@@ -5,6 +5,8 @@ ScriptsOnlyBuild:
     - Character
     - CombatManager
     - CreateWorld
+    - EnemyController
+    - EnemySpawner
     - Environment
     - EnvironmentTile
     - Game
@@ -33,6 +35,7 @@ ScriptsOnlyBuild:
     - UnityEngine.UI.CanvasScaler
     - UnityEngine.UI.ContentSizeFitter
     - UnityEngine.UI.GraphicRaycaster
+    - UnityEngine.UI.GridLayoutGroup
     - UnityEngine.UI.Image
     - UnityEngine.UI.Mask
     - UnityEngine.UI.ScrollRect
@@ -91,6 +94,8 @@ ScriptsOnlyBuild:
     - Class: 114
       Script: {instanceID: 9872}
     - Class: 114
+      Script: {instanceID: 9922}
+    - Class: 114
       Script: {instanceID: 9970}
     - Class: 114
       Script: {instanceID: 10058}
@@ -103,39 +108,43 @@ ScriptsOnlyBuild:
     - Class: 114
       Script: {instanceID: 10268}
     - Class: 114
-      Script: {instanceID: 10346}
+      Script: {instanceID: 10282}
     - Class: 114
-      Script: {instanceID: 10380}
+      Script: {instanceID: 10348}
     - Class: 114
-      Script: {instanceID: 10414}
+      Script: {instanceID: 10382}
     - Class: 114
-      Script: {instanceID: 10422}
+      Script: {instanceID: 10416}
     - Class: 114
-      Script: {instanceID: 10508}
+      Script: {instanceID: 10424}
     - Class: 114
       Script: {instanceID: 10510}
     - Class: 114
-      Script: {instanceID: 10592}
+      Script: {instanceID: 10512}
     - Class: 114
-      Script: {instanceID: 10676}
+      Script: {instanceID: 10560}
     - Class: 114
-      Script: {instanceID: 10800}
+      Script: {instanceID: 10596}
     - Class: 114
-      Script: {instanceID: 10814}
+      Script: {instanceID: 10680}
+    - Class: 114
+      Script: {instanceID: 10804}
     - Class: 114
       Script: {instanceID: 10818}
     - Class: 114
-      Script: {instanceID: 11032}
+      Script: {instanceID: 10822}
     - Class: 114
-      Script: {instanceID: 11178}
+      Script: {instanceID: 11036}
     - Class: 114
-      Script: {instanceID: 11276}
+      Script: {instanceID: 11082}
     - Class: 114
-      Script: {instanceID: 11374}
+      Script: {instanceID: 11184}
     - Class: 114
-      Script: {instanceID: 11406}
+      Script: {instanceID: 11282}
     - Class: 114
-      Script: {instanceID: 22246}
+      Script: {instanceID: 11380}
+    - Class: 114
+      Script: {instanceID: 11412}
     - Class: 115
       Script: {instanceID: 0}
     - Class: 128
@@ -349,6 +358,12 @@ ScriptsOnlyBuild:
     className: TMP_SpriteAsset
   - hash:
       serializedVersion: 2
+      Hash: c5526cb3707aaeed219456795111949f
+    assemblyName: Assembly-CSharp.dll
+    namespaceName: 
+    className: CombatManager
+  - hash:
+      serializedVersion: 2
       Hash: c3d3430df9e3ea95e3e3d587961390fb
     assemblyName: Unity.Timeline.dll
     namespaceName: UnityEngine.Timeline
@@ -367,7 +382,7 @@ ScriptsOnlyBuild:
     className: Character
   - hash:
       serializedVersion: 2
-      Hash: 645c37faae34197c0edd23241b06996e
+      Hash: 03970c2af1e3222f9ae252789f125b5d
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: Game
@@ -403,13 +418,13 @@ ScriptsOnlyBuild:
     className: TMP_SpriteAnimator
   - hash:
       serializedVersion: 2
-      Hash: 35f993a12673e3654578c0e5d7ff103c
+      Hash: 47ab0af9c5a1a75365e129d632c38fb9
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: Inventory
   - hash:
       serializedVersion: 2
-      Hash: 8954903c43ce598f9ac8369fc9200137
+      Hash: a6a045bd1640e71c826b7151598518de
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: Environment
@@ -419,6 +434,12 @@ ScriptsOnlyBuild:
     assemblyName: UnityEngine.TestRunner.dll
     namespaceName: UnityEngine.TestTools.TestRunner.Callbacks
     className: RemoteTestResultSender
+  - hash:
+      serializedVersion: 2
+      Hash: ef965baf9217ca66a80364b1a42b55d0
+    assemblyName: Assembly-CSharp.dll
+    namespaceName: 
+    className: EnemyController
   - hash:
       serializedVersion: 2
       Hash: 4fd8bf02e3089425d3502e26c44ba31a
@@ -481,7 +502,7 @@ ScriptsOnlyBuild:
     className: ActivationPlayableAsset
   - hash:
       serializedVersion: 2
-      Hash: bd6b4d0caacb0dc78f6641cc63772948
+      Hash: bd683516278105dfe19b8d8d4fe3954b
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: ItemStore
@@ -523,6 +544,12 @@ ScriptsOnlyBuild:
     className: BeforeAfterTestCommandState
   - hash:
       serializedVersion: 2
+      Hash: 09d052ee95202c18ceb338fe295b4a50
+    assemblyName: Assembly-CSharp.dll
+    namespaceName: 
+    className: EnemySpawner
+  - hash:
+      serializedVersion: 2
       Hash: c3d3430df9e3ea95e3e3d587961390fb
     assemblyName: Unity.Timeline.dll
     namespaceName: UnityEngine.Timeline
@@ -535,7 +562,7 @@ ScriptsOnlyBuild:
     className: TMP_StyleSheet
   - hash:
       serializedVersion: 2
-      Hash: 3cf0e3aacc063cf89f8b97c17868192b
+      Hash: 347d6a46c149d69c01cc97d1cfdd8ad0
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: ItemManager
@@ -629,12 +656,6 @@ ScriptsOnlyBuild:
     assemblyName: Unity.Timeline.dll
     namespaceName: UnityEngine.Timeline
     className: PlayableTrack
-  - hash:
-      serializedVersion: 2
-      Hash: 71c1c7aeb8ea7a0c766b0c409244e739
-    assemblyName: Assembly-CSharp.dll
-    namespaceName: 
-    className: CombatManager
   platform: 19
   scenePathNames:
   - Assets/Scenes/World.unity

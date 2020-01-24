@@ -39,16 +39,28 @@ public class CombatManager : MonoBehaviour
 
     public void EngageCombat(List<Character> e)
     {
-        player = GameObject.FindGameObjectWithTag("Player").GetComponent<Character>();
+        if (e.Count > 0)
+        {
+            player = GameObject.FindGameObjectWithTag("Player").GetComponent<Character>();
 
-        state = combatState.START;
-        enemies.Clear();
-        enemies.AddRange(e);
-        currentEnemy = e[0];
+            //DEBUG
+            player.damage = 20;
 
-        BattleHUD.gameObject.SetActive(true);
-        UpdateHUD();
-        state = combatState.PLAYER;
+            state = combatState.START;
+            enemies.Clear();
+            enemies.AddRange(e);
+            currentEnemy = e[0];
+
+            BattleHUD.gameObject.SetActive(true);
+            UpdateHUD();
+            state = combatState.PLAYER;
+            PlayerAttacks.SetActive(true);
+
+        }
+        else
+        {
+            Debug.LogError("Invalid enemy list. Unable to engage in combat");
+        }
     }
 
     private void UpdateHUD()
@@ -150,13 +162,16 @@ public class CombatManager : MonoBehaviour
         {
             dialogue.text = "You prepare your next move...";
             state = combatState.PLAYER;
+            PlayerAttacks.SetActive(true);
         }
+        turnTaken = false;
     }
 
 
 
     IEnumerator PlayerAttack(attackType attack)
     {
+        turnTaken = true;
         bool enemyDead = false;
 
         switch (attack)
@@ -207,6 +222,7 @@ public class CombatManager : MonoBehaviour
         }
         else
         {
+            PlayerAttacks.SetActive(false);
             dialogue.text = "Your oponent prepares to attack...";
             state = combatState.ENEMY;
             yield return new WaitForSeconds(1);
@@ -214,82 +230,86 @@ public class CombatManager : MonoBehaviour
         }
     }
 
+    bool turnTaken = false;
+
     public void PlayerTurnOnCLick(int a)
     {
-        attackType attack = (attackType)a;
-        Debug.Log(attack);
-
-        if (state == combatState.PLAYER)
+        if (!turnTaken)
         {
-            switch (attack)
+            attackType attack = (attackType)a;
+
+            if (state == combatState.PLAYER)
             {
-                case attackType.MELEE:
-                    if (player.Consume(2, 15))
-                    {
-                        dialogue.text = "You perform a melee attack.";
-                        StartCoroutine(PlayerAttack(attack));
-                    }
-                    else
-                    {
-                        dialogue.text = "You don't have enough stamina to perform a melee attack.";
-                    }
-                    break;
-                case attackType.MAGIC:
-                    if (player.Consume(1, 15))
-                    {
-                        dialogue.text = "You perform a magic attack.";
-                        StartCoroutine(PlayerAttack(attack));
-                    }
-                    else
-                    {
-                        dialogue.text = "You don't have enough magic to perform a magic attack.";
-                    }
-                    break;
-                case attackType.HEAL:
-                    if (player.Consume(1, 15))
-                    {
-                        dialogue.text = "You use magic to heal yourself.";
-                        StartCoroutine(PlayerAttack(attack));
-                    }
-                    else
-                    {
-                        dialogue.text = "You don't have enough magic to cast heal.";
-                    }
-                    break;
-                case attackType.POTION:
-                    if (player.gameObject.GetComponent<Inventory>().potionsCount > 0)
-                    {
-                        dialogue.text = "You consume a potion to restore yourself.";
-                        StartCoroutine(PlayerAttack(attack));
-                    }
-                    else
-                    {
-                        dialogue.text = "You don't have enough potions to perform this action.";
-                    }
+                switch (attack)
+                {
+                    case attackType.MELEE:
+                        if (player.Consume(2, 15))
+                        {
+                            dialogue.text = "You perform a melee attack.";
+                            StartCoroutine(PlayerAttack(attack));
+                        }
+                        else
+                        {
+                            dialogue.text = "You don't have enough stamina to perform a melee attack.";
+                        }
+                        break;
+                    case attackType.MAGIC:
+                        if (player.Consume(1, 15))
+                        {
+                            dialogue.text = "You perform a magic attack.";
+                            StartCoroutine(PlayerAttack(attack));
+                        }
+                        else
+                        {
+                            dialogue.text = "You don't have enough magic to perform a magic attack.";
+                        }
+                        break;
+                    case attackType.HEAL:
+                        if (player.Consume(1, 15))
+                        {
+                            dialogue.text = "You use magic to heal yourself.";
+                            StartCoroutine(PlayerAttack(attack));
+                        }
+                        else
+                        {
+                            dialogue.text = "You don't have enough magic to cast heal.";
+                        }
+                        break;
+                    case attackType.POTION:
+                        if (player.gameObject.GetComponent<Inventory>().potionsCount > 0)
+                        {
+                            dialogue.text = "You consume a potion to restore yourself.";
+                            StartCoroutine(PlayerAttack(attack));
+                        }
+                        else
+                        {
+                            dialogue.text = "You don't have enough potions to perform this action.";
+                        }
 
-                    break;
-                case attackType.BLOCK:
-                    if (player.Consume(2, 5))
-                    {
-                        dialogue.text = "You attempt to block your opponents next attack, you feel renewed.";
+                        break;
+                    case attackType.BLOCK:
+                        if (player.Consume(2, 5))
+                        {
+                            dialogue.text = "You attempt to block your opponents next attack, you feel renewed.";
+                            StartCoroutine(PlayerAttack(attack));
+                        }
+                        else
+                        {
+                            dialogue.text = "You don't have enough stamina to block.";
+                        }
+                        break;
+                    case attackType.COWER:
                         StartCoroutine(PlayerAttack(attack));
-                    }
-                    else
-                    {
-                        dialogue.text = "You don't have enough stamina to block.";
-                    }
-                    break;
-                case attackType.COWER:
-                    StartCoroutine(PlayerAttack(attack));
-                    break;
-                default:
-                    Debug.LogError("Invalid attack type");
-                    break;
+                        break;
+                    default:
+                        Debug.LogError("Invalid attack type");
+                        break;
+                }
             }
-        }
-        else
-        {
-            Debug.LogError("Player attack buttons should not be visible when not on the players turn.");
+            else
+            {
+                Debug.LogError("Player attack buttons should not be visible when not on the players turn.");
+            }
         }
     }
 
@@ -302,6 +322,7 @@ public class CombatManager : MonoBehaviour
         if (enemies.Count > 1)
         {
             enemies.RemoveAt(0);
+            currentEnemy.GetComponent<EnemyController>().Die();
 
             currentEnemy = enemies[0];
             state = combatState.PLAYER;
@@ -309,6 +330,8 @@ public class CombatManager : MonoBehaviour
         else
         {
             enemies.RemoveAt(0);
+            currentEnemy.GetComponent<EnemyController>().Die();
+            currentEnemy = null;
 
             BattleHUD.gameObject.SetActive(false);
             GameObject.FindGameObjectWithTag("GameController").GetComponent<Game>().PlayerCaught = false;
@@ -319,13 +342,6 @@ public class CombatManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(state != combatState.PLAYER && PlayerAttacks.activeSelf)
-        {
-            PlayerAttacks.SetActive(false);
-        }
-        else if(state == combatState.PLAYER && !PlayerAttacks.activeSelf)
-        {
-            PlayerAttacks.SetActive(true);
-        }
+        
     }
 }

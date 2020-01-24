@@ -9,8 +9,6 @@ public class Inventory : MonoBehaviour
     [SerializeField] public int capacity;
     public bool isContainer = false;
 
-    public List<GameObject> gridcells = new List<GameObject>();
-
     public int potionsCount;
     public int currency;
 
@@ -24,30 +22,60 @@ public class Inventory : MonoBehaviour
 
         if (isContainer)
         {
+            capacity = 5;
             for (int i = 0; i < Random.Range(1, 5); i++)
             {
-                AddItem(Random.Range(0, manager.AllItems.Count));
+                AddItem(Random.Range(0, manager.AllItems.Count), 1);
             }
         }
 
     }
 
-    public void AddItem(int id)
+    public void SetCarryCapacity(int cap)
+    {
+        capacity = cap;
+    }
+
+    public void AddItem(int id, int amount)
     {
         if (inventory.Contains(manager.AllItems[id]))
         {
-            foreach (Item i in inventory)
+            if (manager.AllItems[id].type != ItemType.QUESTITEM)
             {
-                if (i == manager.AllItems[id])
+                foreach (Item i in inventory)
                 {
-                    i.quantity++;
-                    return;
+                    if (i == manager.AllItems[id])
+                    {
+                        i.quantity++;
+                        return;
+                    }
                 }
             }
+            else
+            {
+                if (inventory.Count < capacity)
+                {
+                    inventory.Add(manager.AllItems[id]);
+                }
+                else
+                {
+                    Debug.Log("Overencumbered!");
+                }
+            }
+           
         }
         else
         {
-            inventory.Add(manager.AllItems[id]);
+            if (inventory.Count < capacity)
+            {
+                inventory.Add(manager.AllItems[id]);
+            }
+            else
+            {
+                Debug.Log("Overencumbered!");
+            }
+
+
         }
 
         if(manager.AllItems[id].isPotion)
@@ -59,7 +87,6 @@ public class Inventory : MonoBehaviour
         {
             currency++;
         }
-        //manager.GetComponent<Game>().RefreshInventory(!isContainer);
     }
 
     public void RemoveItem(int id)
@@ -75,24 +102,86 @@ public class Inventory : MonoBehaviour
                 else
                 {
                     inventory.Remove(i);
+                }
 
-                    if(gridcells != null)
+                if (i.isPotion)
+                {
+                    potionsCount--;
+                }
+
+                if (i.isCurrency)
+                {
+                    currency--;
+                }
+                return;
+            }
+        }
+
+       
+    }
+
+
+    public void Equip(ItemStore i)
+    {
+        if (i.type != ItemType.MONEY && i.type != ItemType.QUESTITEM)
+        {
+            Character character = transform.gameObject.GetComponent<Character>();
+
+            if (character != null)
+            {
+                if (i.type == ItemType.CONSUMABLE)
+                {
+                    character.Restore(0, 50);
+                    character.Restore(1, 25);
+                    character.Restore(2, 25);
+                    RemoveItem(i.ID);
+                }
+                else
+                {
+                    foreach (Item item in inventory)
                     {
-                       foreach(GameObject g in gridcells)
+                        if (item.id == i.ID
+                            && item.defence == i.armour
+                            && item.attack == i.weaponDmg)
                         {
-                            if(g.GetComponent<ItemStore>().ID == id)
+                            if (!item.isEquipped)
                             {
-                                Destroy(g);
-                                gridcells.Clear();
+                                item.isEquipped = true;
+                                character.damage += i.weaponDmg;
+                                character.dmgThreshold += i.armour;
+                                Debug.Log("Equipping " + item.itemName);
+                                Debug.Log(character.damage + ", " + character.dmgThreshold);
+                                return;
+                            }
+                            else
+                            {
+                                item.isEquipped = false;
+                                character.damage -= i.weaponDmg;
+                                character.dmgThreshold -= i.armour;
+                                Debug.Log("Unequipping " + item.itemName);
+                                Debug.Log(character.damage + ", " + character.dmgThreshold);
                                 return;
                             }
                         }
-
                     }
-                }
 
-                gridcells.Clear();
-                return;
+
+                }
+            }
+        }
+
+    }
+
+    public void Unequip(ItemStore i)
+    {
+        Character character = transform.gameObject.GetComponent<Character>();
+
+        if (character != null)
+        {
+            if(i.ID == 2 || i.ID == 3)
+            { 
+                character.damage -= i.weaponDmg;
+                character.dmgThreshold -= i.armour;
             }
         }
     }

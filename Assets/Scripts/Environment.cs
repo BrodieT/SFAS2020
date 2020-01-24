@@ -36,8 +36,6 @@ public class Environment : MonoBehaviour
     {
         mAll = new List<EnvironmentTile>();
         mToBeTested = new List<EnvironmentTile>();
-
-        
     }
 
     private void OnDrawGizmos()
@@ -98,10 +96,6 @@ public class Environment : MonoBehaviour
     }
 
 
-    ////////////////////////////////////////////////////////////////////
-    ///FUNCTIONS USING LISTS OF LISTS INSTEAD OF 2D ARRAYS
-    ///////////////////////////////////////////////////////////////////
-    ///
     public List<GameObject> structurePrefabs = new List<GameObject>();
 
     private List<List<EnvironmentTile>> Generate(List<List<EnvironmentTile>> map, bool isDungeon, Vector2Int Size, float AccessiblePercentage)
@@ -129,23 +123,11 @@ public class Environment : MonoBehaviour
                 {
                     isAccessible = start || Random.value < 1;
                 }
-                //List<EnvironmentTile> tiles;
-
-                //if (isDungeon)
-                //{
-                //    tiles = isAccessible ? AccessibleTilesDungeon : InaccessibleTilesDungeon;
-                //}
-                //else
-                //{
-                //   tiles = isAccessible ? AccessibleTilesWorld : InaccessibleTilesWorld;
-                //}
-
-                //EnvironmentTile prefab = tiles[Random.Range(0, tiles.Count)];
-                EnvironmentTile tile = new EnvironmentTile();// = Instantiate(prefab, position, Quaternion.identity, transform);
+             
+                EnvironmentTile tile = new EnvironmentTile();
                 tile.Position = new Vector3(position.x + (TileSize / 2), TileHeight, position.z + (TileSize / 2));
                 tile.IsAccessible = isAccessible;
                 tile.IsStructure = false;
-                //                tile.gameObject.name = string.Format("Tile({0},{1})", x, y);
                 tile.GridPos = new Vector2Int(x, y);
                 map[x].Add(tile);
 
@@ -247,6 +229,13 @@ public class Environment : MonoBehaviour
         }
 
         
+        for(int i = 0; i < 5; i ++)
+        {
+            for(int j = 0; j < 5; j++)
+            {
+                map[i][j].IsAccessible = true;
+            }
+        }
 
 
         map[3][3].IsChest = true;
@@ -265,7 +254,7 @@ public class Environment : MonoBehaviour
         {
             for (int j = -radius; j < radius; j++)
             {
-                if (x + i > 5 && x + i < Size.x && y + j > 5 && y + j < Size.y)
+                if (x + i > 10 && x + i < Size.x && y + j > 10 && y + j < Size.y)
                 {
                     eT.Add(map[x + i][y + j]);
                 }
@@ -337,6 +326,7 @@ public class Environment : MonoBehaviour
         }
         
     }
+
 
     public List<EnvironmentTile> nullTile;
     public EnvironmentTile chest;

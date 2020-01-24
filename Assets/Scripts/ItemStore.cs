@@ -4,39 +4,73 @@ using UnityEngine;
 
 public class ItemStore : MonoBehaviour
 {
-    public int ID = 0;
+    public int ID { get; set; }
+    public string itemName { get; set; }
+    public ItemType type { get; set; }
+    public string Description { get; set; }
     ItemManager manager;
     GameObject player;
     GameObject container;
     public bool playerOwned;
 
+    public bool isEquipped = false;
+    public int armour { get; set; }
+    public int weaponDmg { get; set; }
+    
 
     private void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player");
     }
 
-    public void SetContainer(GameObject c)
+    public void setItem(ItemStore i)
     {
-        container = c;
+        ID = i.ID;
+        itemName = i.itemName;
+        type = i.type;
+        Description = i.Description;
+        armour = i.armour;
+        weaponDmg = i.weaponDmg;
+        isEquipped = i.isEquipped;
+
+
     }
 
-  
-    public void ButtonClicked()
+    public void setItem(Item i)
     {
-        if (container != null)
+        ID = i.id;
+        itemName = i.itemName;
+        type = i.type;
+        Description = "This is a " + itemName;
+        armour = i.defence;
+        weaponDmg = i.attack;
+        isEquipped = i.isEquipped;
+
+        switch (i.type)
         {
-            if (!playerOwned)
-            {
-                player.GetComponent<Inventory>().AddItem(ID);
-                container.GetComponent<Inventory>().RemoveItem(ID);
-            }
-            else
-            {
-                player.GetComponent<Inventory>().RemoveItem(ID);
-                container.GetComponent<Inventory>().AddItem(ID);
-            }
+            case ItemType.MONEY:
+                Description += ". Money can be exchanged for goods and services.";
+                break;
+            case ItemType.CONSUMABLE:
+                Description += ". It can be consumed to restore your cores.";
+                break;
+            case ItemType.WEAPON:
+                Description += ". It can be equipped to increase your damage in combat by " + weaponDmg + " hit points";
+                break;
+            case ItemType.ARMOUR:
+                Description += ". It can be equipped to increase your damage threshold by " + armour + ", decreasing your opponent's effectiveness in combat.";
+                break;
+            case ItemType.QUESTITEM:
+                Description += ". It can be returned to the quest giver for a reward.";
+                break;
+            default:
+                Debug.LogError("Invalid Item ID. Ensure additional cases are added");
+                break;
         }
+
+       
     }
+  
+   
   
 }

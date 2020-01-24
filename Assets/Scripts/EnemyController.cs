@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum EnemyState { PATROL, CAUGHT, ATTACK}
+public enum EnemyState { PATROL, CAUGHT, ATTACK, DEAD}
 public class EnemyController : MonoBehaviour
 {
     Environment Map;
@@ -44,25 +44,28 @@ public class EnemyController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        List<EnvironmentTile> route2P = Map.Solve(me.CurrentPosition, player.CurrentPosition);
-        if(route2P != null)
+        if (myState != EnemyState.DEAD && !me.InCombat)
         {
-            DistanceToPlayer = route2P.Count;
-        }
+            List<EnvironmentTile> route2P = Map.Solve(me.CurrentPosition, player.CurrentPosition);
+            if (route2P != null)
+            {
+                DistanceToPlayer = route2P.Count;
+            }
 
-        if (DistanceToPlayer < 10 && DistanceToPlayer > 2)
-        {
-            myState = EnemyState.ATTACK;
+            if (DistanceToPlayer < 10 && DistanceToPlayer > 2)
+            {
+                myState = EnemyState.ATTACK;
+            }
+            else if (DistanceToPlayer <= 2)
+            {
+                me.InCombat = true;
+                myState = EnemyState.CAUGHT;
+            }
+            else
+            {
+                myState = EnemyState.PATROL;
+            }
         }
-        else if(DistanceToPlayer <= 2)
-        {
-            myState = EnemyState.CAUGHT;
-        }
-        else
-        {
-            myState = EnemyState.PATROL;
-        }
-
         switch(myState)
         {
             case EnemyState.PATROL:
@@ -100,9 +103,20 @@ public class EnemyController : MonoBehaviour
 
                 GameObject.FindGameObjectWithTag("GameController").GetComponent<Game>().PlayerCaught = true;
                 break;
+            case EnemyState.DEAD:
+                //Destroy(transform.gameObject);
+                Debug.Log("I am dead.");
+                break;
+            default:
+                break;
         }
             
         
 
+    }
+
+    public void Die()
+    {
+        myState = EnemyState.DEAD;
     }
 }
