@@ -3,12 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public enum EnemyState { PATROL, CAUGHT, ATTACK, DEAD}
+
+//This script handles the enemy movement
+//An enemy will move in a random direction until it is within range of the player
+//after which it will engage in combat
 public class EnemyController : MonoBehaviour
 {
     Environment Map;
     Character me;
     Character player;
-    EnemyState myState = EnemyState.PATROL;
+    public EnemyState myState = EnemyState.PATROL;
 
     Vector2Int[] PatrolPoints = new Vector2Int[5];
 

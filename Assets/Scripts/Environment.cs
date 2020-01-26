@@ -147,11 +147,15 @@ public class Environment : MonoBehaviour
         return map;
     }
 
+    //This function handles the generation of structures on the world map.
+    //It chooses several random points on the map and places an entrance to a dungeon there
     private List<List<EnvironmentTile>> GenerateStructures(List<List<EnvironmentTile>> map, Vector2Int Size)
     {
         int structCounter = 1;
         int counter = 0;
         int StructCount = Structures.Count;
+        //This will generate 5 structures across the map.
+        //The grid positions will be chosen at random and the surrounding tiles will be made inaccessible excluding a path up to the entrance.
         while (StructCount > 0)
         {
             if (counter <= 5)
@@ -159,6 +163,7 @@ public class Environment : MonoBehaviour
                 int x = Random.Range(0, Size.x);
                 int y = Random.Range(0, Size.y);
 
+                //Checks that the chosen spot wont result in structures overlapping
                 if (!map[x][y].IsStructure && !IsNear(x, y, 4, Size, map) && y > Structures[0].GetComponent<StructureData>().Length / 2 + 1)
                 {
                     int w = Structures[0].GetComponent<StructureData>().Width / 2;
@@ -229,6 +234,8 @@ public class Environment : MonoBehaviour
         }
 
         
+        //Clear the starting area to ensure the player can access the map 
+        //A safe-area or town could be spawned here for access to a merchant/quest-giver etc.
         for(int i = 0; i < 5; i ++)
         {
             for(int j = 0; j < 5; j++)
@@ -237,7 +244,8 @@ public class Environment : MonoBehaviour
             }
         }
 
-
+        //Spawn a tester chest at the starting position of the player 
+        //Used for testing the trading system but would later be adapted for spawning throughout the dungeons
         map[3][3].IsChest = true;
         map[3][3].IsAccessible = true;
 
@@ -385,7 +393,14 @@ public class Environment : MonoBehaviour
 
                 if (map[x][y].IsStructure && map[x][y].IsEntrance)
                 {
-                    prefab = Structures[0];
+                    if (isDungeon)
+                    {
+                        prefab = Structures[1];
+                    }
+                    else
+                    {
+                        prefab = Structures[0];
+                    }
                 }
 
                 if (map[x][y].IsChest)
@@ -453,7 +468,7 @@ public class Environment : MonoBehaviour
             Start = mmap[0][0];
         }
     }
-    /////////////////////////////////////////////////////////////////////////////////
+
 
     public List<EnvironmentTile> roomTiles = new List<EnvironmentTile>();
 

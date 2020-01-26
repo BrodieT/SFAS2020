@@ -84,67 +84,67 @@ ScriptsOnlyBuild:
     - Class: 109
       Script: {instanceID: 0}
     - Class: 114
-      Script: {instanceID: 9682}
+      Script: {instanceID: 9684}
     - Class: 114
-      Script: {instanceID: 9734}
-    - Class: 114
-      Script: {instanceID: 9832}
+      Script: {instanceID: 9736}
     - Class: 114
       Script: {instanceID: 9834}
     - Class: 114
-      Script: {instanceID: 9872}
+      Script: {instanceID: 9836}
     - Class: 114
-      Script: {instanceID: 9922}
+      Script: {instanceID: 9874}
     - Class: 114
-      Script: {instanceID: 9970}
+      Script: {instanceID: 9924}
     - Class: 114
-      Script: {instanceID: 10058}
+      Script: {instanceID: 9972}
     - Class: 114
-      Script: {instanceID: 10162}
+      Script: {instanceID: 10060}
     - Class: 114
-      Script: {instanceID: 10206}
+      Script: {instanceID: 10164}
     - Class: 114
-      Script: {instanceID: 10248}
+      Script: {instanceID: 10208}
     - Class: 114
-      Script: {instanceID: 10268}
+      Script: {instanceID: 10250}
     - Class: 114
-      Script: {instanceID: 10282}
+      Script: {instanceID: 10270}
     - Class: 114
-      Script: {instanceID: 10348}
+      Script: {instanceID: 10284}
     - Class: 114
-      Script: {instanceID: 10382}
+      Script: {instanceID: 10350}
     - Class: 114
-      Script: {instanceID: 10416}
+      Script: {instanceID: 10384}
     - Class: 114
-      Script: {instanceID: 10424}
+      Script: {instanceID: 10418}
     - Class: 114
-      Script: {instanceID: 10510}
+      Script: {instanceID: 10426}
     - Class: 114
       Script: {instanceID: 10512}
     - Class: 114
-      Script: {instanceID: 10560}
+      Script: {instanceID: 10514}
     - Class: 114
-      Script: {instanceID: 10596}
+      Script: {instanceID: 10562}
     - Class: 114
-      Script: {instanceID: 10680}
+      Script: {instanceID: 10598}
     - Class: 114
-      Script: {instanceID: 10804}
+      Script: {instanceID: 10682}
     - Class: 114
-      Script: {instanceID: 10818}
+      Script: {instanceID: 10806}
     - Class: 114
-      Script: {instanceID: 10822}
+      Script: {instanceID: 10820}
     - Class: 114
-      Script: {instanceID: 11036}
+      Script: {instanceID: 10824}
     - Class: 114
-      Script: {instanceID: 11082}
+      Script: {instanceID: 11038}
     - Class: 114
-      Script: {instanceID: 11184}
+      Script: {instanceID: 11084}
     - Class: 114
-      Script: {instanceID: 11282}
+      Script: {instanceID: 11186}
     - Class: 114
-      Script: {instanceID: 11380}
+      Script: {instanceID: 11284}
     - Class: 114
-      Script: {instanceID: 11412}
+      Script: {instanceID: 11382}
+    - Class: 114
+      Script: {instanceID: 11414}
     - Class: 115
       Script: {instanceID: 0}
     - Class: 128
@@ -382,7 +382,7 @@ ScriptsOnlyBuild:
     className: Character
   - hash:
       serializedVersion: 2
-      Hash: 03970c2af1e3222f9ae252789f125b5d
+      Hash: 8d5c68f7153a3c19b1bf9003583aca4d
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: Game
@@ -418,7 +418,7 @@ ScriptsOnlyBuild:
     className: TMP_SpriteAnimator
   - hash:
       serializedVersion: 2
-      Hash: 47ab0af9c5a1a75365e129d632c38fb9
+      Hash: d382c4ffe919b0a1aedebefc40596e93
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: Inventory
@@ -436,7 +436,7 @@ ScriptsOnlyBuild:
     className: RemoteTestResultSender
   - hash:
       serializedVersion: 2
-      Hash: ef965baf9217ca66a80364b1a42b55d0
+      Hash: a34fb21d2b1ac2a62c25e9f38e68492c
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: EnemyController
@@ -562,7 +562,7 @@ ScriptsOnlyBuild:
     className: TMP_StyleSheet
   - hash:
       serializedVersion: 2
-      Hash: 347d6a46c149d69c01cc97d1cfdd8ad0
+      Hash: 188862d2ead2f1a6ce208155ee371c20
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: ItemManager
@@ -659,4 +659,4 @@ ScriptsOnlyBuild:
   platform: 19
   scenePathNames:
   - Assets/Scenes/World.unity
-  playerPath: C:/Users/templ/OneDrive/Documents/SFASBuild/SFAS2020.exe
+  playerPath: C:/Users/templ/OneDrive/Documents/DungeonDelver/SFAS2020.exe

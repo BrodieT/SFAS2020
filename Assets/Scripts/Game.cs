@@ -50,12 +50,13 @@ public class Game : MonoBehaviour
     public bool PlayerCaught = false;
 
     public int target = -1;
-    
-    
-    
-    
-    
-    
+
+
+    public Sprite emptySlot;
+    public bool isDungeon = false;
+
+
+
     void Start()
     {
 
@@ -125,7 +126,7 @@ public class Game : MonoBehaviour
                     {
                         //ToggleOtherInventoryOn(tile.gameObject);
                         //TogglePlayerInventory();
-                        tile = mMap.mmap[tile.GridPos.x - 1][tile.GridPos.y];
+                        tile = mMap.mmap[tile.GridPos.x][tile.GridPos.y - 1];
                     }
 
                     route = mMap.Solve(mCharacter.CurrentPosition, tile);
@@ -139,36 +140,45 @@ public class Game : MonoBehaviour
         }
 
         //DEBUG////////////
-        if(Input.GetKeyDown(KeyCode.A))
-        {
-            mCharacter.gameObject.GetComponent<Inventory>().AddItem(Random.Range(0, 5), 1);
-        }
+        //if(Input.GetKeyDown(KeyCode.A))
+        //{
+        //    mCharacter.gameObject.GetComponent<Inventory>().AddItem(Random.Range(0, 4), 1);
+        //}
 
-        if (Input.GetKeyDown(KeyCode.D))
-        {
-            //mCharacter.gameObject.GetComponent<Inventory>().RemoveItem(2);
-        }
-        ////////////////
+        //if (Input.GetKeyDown(KeyCode.D))
+        //{
+        //    //mCharacter.gameObject.GetComponent<Inventory>().RemoveItem(2);
+        //}     
+        //////////////////
 
         if (PlayerCaught && !mCharacter.InCombat)
         {
             List<Character> EnemiesInCombat = new List<Character>();
             foreach(Character e in GetComponent<EnemySpawner>().GetActiveEnemies())
             {
-                if(e.gameObject.GetComponent<EnemyController>().DistanceToPlayer < 10)
+                if(e.gameObject.GetComponent<EnemyController>().myState == EnemyState.CAUGHT)
                 {                    
                     EnemiesInCombat.Add(e);
                     e.gameObject.SetActive(false);
+                    break;
                 }
             }
-            GetComponent<CombatManager>().EngageCombat(EnemiesInCombat);
-            PlayerCaught = false;
+            if (EnemiesInCombat.Count > 0)
+            {
 
+
+                GetComponent<CombatManager>().EngageCombat(EnemiesInCombat);
+                mCharacter.InCombat = true;
+                PlayerCaught = false;
+            }
         }
 
-        if (mCharacter.atDestination && mCharacter.CurrentPosition.IsChest)
+        if (mCharacter.atDestination && mMap.mmap[mCharacter.CurrentPosition.GridPos.x][mCharacter.CurrentPosition.GridPos.y + 1].IsChest)
         {
-            //TogglePlayerInventory();
+            if (!TradeWindow.gameObject.activeSelf)
+            {
+                ShowTradeWindow(true, mMap.mmap[mCharacter.CurrentPosition.GridPos.x][mCharacter.CurrentPosition.GridPos.y + 1].gameObject);
+            }
         }
 
         if (mCharacter.atDestination && mCharacter.CurrentPosition.IsStructure && mCharacter.CurrentPosition.IsEntrance)
@@ -342,6 +352,269 @@ public class Game : MonoBehaviour
         ShowPlayerMenu(true);
     }
 
+    GameObject currentContainer;
+
+    public void CloseTradeWindow()
+    {
+        GameObject playerContent = TradeWindow.transform.GetChild(1).GetChild(0).GetChild(0).gameObject;
+        GameObject otherContent = TradeWindow.transform.GetChild(2).GetChild(0).GetChild(0).gameObject;
+
+        TradeWindow.transform.GetChild(1).GetChild(1).GetComponent<Scrollbar>().value = 1;
+        TradeWindow.transform.GetChild(2).GetChild(1).GetComponent<Scrollbar>().value = 1;
+
+        currentContainer = null;
+
+        foreach (Transform g in playerContent.transform)
+        {
+            g.GetComponent<Image>().sprite = emptySlot;
+            if (g.GetChild(0).gameObject.activeSelf)
+            {
+                g.GetChild(0).gameObject.SetActive(false);
+            }
+        }
+
+        foreach (Transform g in otherContent.transform)
+        {
+            g.GetComponent<Image>().sprite = emptySlot;
+            if (g.GetChild(0).gameObject.activeSelf)
+            {
+                g.GetChild(0).gameObject.SetActive(false);
+            }
+        }
+
+        List<EnvironmentTile> route = new List<EnvironmentTile>();
+        if (mCharacter.CurrentPosition.GridPos.y - 1 >= 0)
+        {
+            route = mMap.Solve(mCharacter.CurrentPosition, mMap.mmap[mCharacter.CurrentPosition.GridPos.x][mCharacter.CurrentPosition.GridPos.y - 1]);
+
+        }
+        else if(mCharacter.CurrentPosition.GridPos.x - 1 >= 0)
+        {
+            route = mMap.Solve(mCharacter.CurrentPosition, mMap.mmap[mCharacter.CurrentPosition.GridPos.x -1][mCharacter.CurrentPosition.GridPos.y]);
+        }
+        else if(mCharacter.CurrentPosition.GridPos.x + 1 <= mMap.mmap.Count -1)
+        {
+            route = mMap.Solve(mCharacter.CurrentPosition, mMap.mmap[mCharacter.CurrentPosition.GridPos.x + 1][mCharacter.CurrentPosition.GridPos.y]);
+        }
+        else
+        {
+            Debug.LogError("Invalid path. Unable to exit trade");
+        }
+
+
+        if (route != null)
+        {
+            mCharacter.GoTo(route);
+        }
+
+        TradeWindow.gameObject.SetActive(false);
+
+    }
+
+    //This function toggles the trade window on/off when the player interacts with a container/merchant
+    //It loops through each of the UI slots and assigns them an item from their inventory which is used to visually represent the inventory
+    public void ShowTradeWindow(bool show, GameObject container)
+    {
+        
+        GameObject playerContent = TradeWindow.transform.GetChild(1).GetChild(0).GetChild(0).gameObject;
+        GameObject otherContent = TradeWindow.transform.GetChild(2).GetChild(0).GetChild(0).gameObject;
+        
+        TradeWindow.transform.GetChild(1).GetChild(1).GetComponent<Scrollbar>().value = 1;
+        TradeWindow.transform.GetChild(2).GetChild(1).GetComponent<Scrollbar>().value = 1;
+
+        if (show)
+        {
+            currentContainer = container;
+
+            TradeWindow.gameObject.SetActive(true);
+
+            if (container.GetComponent<Inventory>().isContainer)
+            {
+                TradeWindow.transform.GetChild(2).GetChild(2).GetChild(0).GetComponent<Text>().text = "Chest";
+            }
+            else
+            {
+                TradeWindow.transform.GetChild(2).GetChild(2).GetChild(0).GetComponent<Text>().text = "Merchant";
+            }
+
+
+
+            List<Item> playerItems = mCharacter.gameObject.GetComponent<Inventory>().inventory;
+
+            if (playerItems.Count <= playerContent.transform.childCount)
+            {
+                for (int i = 0; i < playerContent.transform.childCount; i++)
+                {
+                    if (playerItems.Count > i)
+                    {
+                        playerContent.transform.GetChild(i).GetComponent<Image>().sprite = playerItems[i].icon;
+                        playerContent.transform.GetChild(i).GetComponent<ItemStore>().setItem(playerItems[i]);
+                        if (playerItems[i].quantity > 1)
+                        {
+                            playerContent.transform.GetChild(i).GetChild(0).gameObject.SetActive(true);
+                            playerContent.transform.GetChild(i).GetChild(0).GetComponent<Text>().text = "x" + playerItems[i].quantity;
+                        }
+                    }
+                    else
+                    {
+                        playerContent.transform.GetChild(i).GetComponent<ItemStore>().ID = 99999;
+                    }
+                }
+
+            }
+
+            if (container != null)
+            {
+                List<Item> otherItems = container.GetComponent<Inventory>().inventory;
+
+                if (otherItems.Count <= otherContent.transform.childCount)
+                {
+                    for (int i = 0; i < otherContent.transform.childCount; i++)
+                    {
+                        if (otherItems.Count > i)
+                        {
+                            otherContent.transform.GetChild(i).GetComponent<Image>().sprite = otherItems[i].icon;
+                            otherContent.transform.GetChild(i).GetComponent<ItemStore>().setItem(otherItems[i]);
+                            if (otherItems[i].quantity > 1)
+                            {
+                                otherContent.transform.GetChild(i).GetChild(0).gameObject.SetActive(true);
+                                otherContent.transform.GetChild(i).GetChild(0).GetComponent<Text>().text = "x" + otherItems[i].quantity;
+                            }
+                        }
+                        else
+                        {
+                            otherContent.transform.GetChild(i).GetComponent<ItemStore>().ID = 99999;
+                        }
+                    }
+                }
+
+            }
+            else
+            {
+                Debug.LogError("Container is NULL");
+
+            }
+
+
+        }
+        else
+        {
+
+            foreach (Transform g in playerContent.transform)
+            {
+                g.GetComponent<Image>().sprite = emptySlot;
+                if (g.GetChild(0).gameObject.activeSelf)
+                {
+                    g.GetChild(0).gameObject.SetActive(false);
+                }
+            }
+
+            foreach (Transform g in otherContent.transform)
+            {
+                g.GetComponent<Image>().sprite = emptySlot;
+                if (g.GetChild(0).gameObject.activeSelf)
+                {
+                    g.GetChild(0).gameObject.SetActive(false);
+                }
+            }
+            TradeWindow.gameObject.SetActive(false);
+
+        }
+    }
+
+
+    //This function handles an item from the container's inventory UI being transferred into the player's inventory
+    public void TransferToPlayer(ItemStore item)
+    {
+        if (currentContainer != null)
+        {
+            //If the item is successfully added to the player then it is safe to remove it from the container
+            if (mCharacter.GetComponent<Inventory>().AddItem(item.ID, 1))
+            {
+                currentContainer.GetComponent<Inventory>().RemoveItem(item.ID);
+
+                ShowTradeWindow(false, null);
+                ShowTradeWindow(true, currentContainer);
+            }
+            else
+            {
+                Debug.Log("Transfer Unsuccessful");
+            }
+        }
+        else
+        {
+            Debug.LogError("Invalid Container");
+        }
+    }
+
+    //This function handles an item from the player's inventory UI being transferred into the container's inventory
+    public void TransferToContainer(ItemStore item)
+    {
+        if (currentContainer != null)
+        {
+            //If the item is successfully added to the container then it is safe to remove it from the player
+            if (currentContainer.GetComponent<Inventory>().AddItem(item.ID, 1))
+            {
+                mCharacter.GetComponent<Inventory>().RemoveItem(item.ID);
+
+                ShowTradeWindow(false, null);
+                ShowTradeWindow(true, currentContainer);
+            }
+            else
+            {
+                Debug.Log("Transfer Unsuccessful");
+            }
+        }
+        else
+        {
+            Debug.LogError("Invalid Container");
+        }
+    }
+
+
+    //This function is no longer being used but could still prove useful if a better solution to the item trading problem is found
+    public void TransferItem(ItemStore i, GameObject a, GameObject b)
+    {
+        if (a.GetComponent<Inventory>().isContainer || a.GetComponent<Inventory>().isMerchant)
+        {
+            CloseTradeWindow();
+      
+            a.GetComponent<Inventory>().inventory.Remove(mCharacter.GetComponent<Inventory>().manager.AllItems[i.ID]);// RemoveItem(i.ID);
+            b.GetComponent<Inventory>().inventory.Add(mCharacter.GetComponent<Inventory>().manager.AllItems[i.ID]);// (i.ID, 1);
+            //ShowTradeWindow(true, a);
+        }
+        else
+        {
+            CloseTradeWindow();
+            a.GetComponent<Inventory>().inventory.Remove(mCharacter.GetComponent<Inventory>().manager.AllItems[i.ID]);// RemoveItem(i.ID);
+            b.GetComponent<Inventory>().inventory.Add(mCharacter.GetComponent<Inventory>().manager.AllItems[i.ID]);// (i.ID, 1);
+
+            //a.GetComponent<Inventory>().RemoveItem(i.ID);
+            //b.GetComponent<Inventory>().AddItem(i.ID, 1);
+            //ShowTradeWindow(true, b);
+        }
+    }
+
+    //This function is not currently being used but its purpose will be to transfer all items in a container's inventory into the player's  
+    public void TakeAll()
+    {
+        if (currentContainer != null)
+        {
+            foreach (Item i in currentContainer.GetComponent<Inventory>().inventory)
+            {
+                if (mCharacter.GetComponent<Inventory>().AddItem(i.id, 1))
+                {
+                    currentContainer.GetComponent<Inventory>().RemoveItem(i.id);
+                }
+            }
+        }
+        else
+        {
+            Debug.LogError("Invalid Container");
+        }
+    }
+ 
+
     //This function toggles the item description window in the player's inventory
     public void ShowItemDescription(bool show, ItemStore i)
     {
@@ -400,12 +673,6 @@ public class Game : MonoBehaviour
         }
     }
 
-
-
-
-
-
-
     //Performs the fade and loads the cell in the background
     IEnumerator LoadCell(int cellID)
     {
@@ -459,12 +726,6 @@ public class Game : MonoBehaviour
         
     }
 
-
-
-    public Sprite emptySlot;
-    public bool isDungeon = false;
-
- 
     //This function Generates the current cell
     public void Generate()
     {

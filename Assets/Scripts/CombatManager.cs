@@ -5,6 +5,10 @@ using UnityEngine.UI;
 
 enum combatState { START, PLAYER, ENEMY, WIN, LOSE, IDLE};
 public enum attackType { MELEE, MAGIC, HEAL, POTION, BLOCK, COWER};
+
+//This script handles the combat mechanic
+//It will handle the enemy decision making in combat and will switch between the combat states where appropriate
+//It also updates the UI for the combat system and waits for player input to take their turn
 public class CombatManager : MonoBehaviour
 {
     combatState state;
@@ -39,6 +43,7 @@ public class CombatManager : MonoBehaviour
 
     public void EngageCombat(List<Character> e)
     {
+        StopAllCoroutines();
         if (e.Count > 0)
         {
             player = GameObject.FindGameObjectWithTag("Player").GetComponent<Character>();
@@ -46,6 +51,7 @@ public class CombatManager : MonoBehaviour
             //DEBUG
             player.damage = 20;
 
+            HealCount = 3;
             state = combatState.START;
             enemies.Clear();
             enemies.AddRange(e);
@@ -157,6 +163,7 @@ public class CombatManager : MonoBehaviour
         if (playerDead)
         {
             state = combatState.LOSE;
+            StopAllCoroutines();
         }
         else
         {
@@ -218,6 +225,7 @@ public class CombatManager : MonoBehaviour
         if(enemyDead)
         {
             state = combatState.WIN;
+            StopAllCoroutines();
             StartCoroutine(PlayerWin());
         }
         else
@@ -330,18 +338,18 @@ public class CombatManager : MonoBehaviour
         else
         {
             enemies.RemoveAt(0);
+            currentEnemy.InCombat = false;
             currentEnemy.GetComponent<EnemyController>().Die();
             currentEnemy = null;
 
             BattleHUD.gameObject.SetActive(false);
             GameObject.FindGameObjectWithTag("GameController").GetComponent<Game>().PlayerCaught = false;
             player.InCombat = false;
+            state = combatState.IDLE;
+            turnTaken = false;
+            StopAllCoroutines();
         }
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+
 }

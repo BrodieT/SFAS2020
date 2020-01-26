@@ -8,7 +8,8 @@ public class Inventory : MonoBehaviour
     public ItemManager manager;
     [SerializeField] public int capacity;
     public bool isContainer = false;
-
+    public bool isMerchant = false;
+    
     public int potionsCount;
     public int currency;
 
@@ -22,10 +23,10 @@ public class Inventory : MonoBehaviour
 
         if (isContainer)
         {
-            capacity = 5;
+            capacity = 30;
             for (int i = 0; i < Random.Range(1, 5); i++)
             {
-                AddItem(Random.Range(0, manager.AllItems.Count), 1);
+                AddItem(Random.Range(0, manager.AllItems.Count - 1), 1);
             }
         }
 
@@ -36,56 +37,74 @@ public class Inventory : MonoBehaviour
         capacity = cap;
     }
 
-    public void AddItem(int id, int amount)
+    public bool AddItem(int id, int amount)
     {
-        if (inventory.Contains(manager.AllItems[id]))
+        //Check if a valid id is given
+        if (id < manager.AllItems[manager.AllItems.Count - 1].id)
         {
-            if (manager.AllItems[id].type != ItemType.QUESTITEM)
+            bool success = false;
+
+            //If the item is already in the inventory then increase the quantity counter
+            if (inventory.Contains(manager.AllItems[id]))
             {
-                foreach (Item i in inventory)
+                if (manager.AllItems[id].type != ItemType.QUESTITEM)
                 {
-                    if (i == manager.AllItems[id])
+                    foreach (Item i in inventory)
                     {
-                        i.quantity++;
-                        return;
+                        if (i == manager.AllItems[id])
+                        {
+                            i.quantity++;
+                            success = true;
+                        }
                     }
                 }
+                else
+                {
+                    if (inventory.Count < capacity)
+                    {
+                        inventory.Add(manager.AllItems[id]);
+                        success = true;
+                    }
+                    else
+                    {
+                        Debug.Log("Overencumbered!");
+                        success = false;
+                    }
+                }
+
             }
-            else
+            else //if the item is not already in the inventory then add as a new item
             {
                 if (inventory.Count < capacity)
                 {
                     inventory.Add(manager.AllItems[id]);
+                    success = true;
                 }
                 else
                 {
                     Debug.Log("Overencumbered!");
+                    success = false;
                 }
             }
-           
+
+            if (success)
+            {
+                if (manager.AllItems[id].isPotion)
+                {
+                    potionsCount++;
+                }
+
+                if (manager.AllItems[id].isCurrency)
+                {
+                    currency++;
+                }
+            }
+            return success;
+
         }
         else
         {
-            if (inventory.Count < capacity)
-            {
-                inventory.Add(manager.AllItems[id]);
-            }
-            else
-            {
-                Debug.Log("Overencumbered!");
-            }
-
-
-        }
-
-        if(manager.AllItems[id].isPotion)
-        {
-            potionsCount++;
-        }
-
-        if (manager.AllItems[id].isCurrency)
-        {
-            currency++;
+            return false;
         }
     }
 
